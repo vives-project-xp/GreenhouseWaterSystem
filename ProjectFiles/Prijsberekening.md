@@ -16,7 +16,7 @@
 
 8. [transformator 12v 32.50 euro](https://www.123-3d.nl/123-3D-Voeding-12V-360-W-30-A-max-i104-t13128.html)
 
-    **Totaal: 240.28 + Waterreservoir (80-130).**
+    **Totaal: 272.78 + Waterreservoir (80-130).**
 
 
     
