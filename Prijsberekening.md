@@ -14,7 +14,7 @@
 
 7. [Schakelrelais](https://www.otronic.nl/nl/5v-hoog-vermogen-relais-250v-30a.html) / [step-up module: 7.45 euro + 0.99 euro](https://www.otronic.nl/nl/4-kanaals-logic-voltage-level-converter.html)
 
-    **Totaal: 240.19 + Waterreservoir (80-130).**
+    **Totaal: 240.28 + Waterreservoir (80-130).**
 
 
     
