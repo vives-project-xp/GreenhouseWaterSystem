@@ -28,6 +28,6 @@ This project will serve as a model for future greenhouse installations, providin
 
 # Architectuur
 
-<img src="/images/" alt="Alt text">
+<img src="Images/Architectuur.drawio.png" alt="Alt text">
 
 
