@@ -25,3 +25,9 @@ Our goal is to create a sustainable, automated greenhouse that not only minimize
 
 This project will serve as a model for future greenhouse installations, providing both environmental and educational value. It demonstrates how technology can be leveraged to create efficient and sustainable agriculture systems in an urban setting.
 
+
+# Architectuur
+
+<img src="/images/" alt="Alt text">
+
+
