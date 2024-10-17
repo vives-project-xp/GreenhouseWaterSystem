@@ -92,4 +92,4 @@
     | GND        | ground    | net          |
     | OUT        | 12VDC     | shakel relais|
     | GND        | ground    | ground       |
-    
+    [More data...](./Recources/Transformator.png)
