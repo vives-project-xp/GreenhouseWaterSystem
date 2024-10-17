@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Monitoring System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .data {
+            margin-bottom: 20px;
+        }
+        .pump-activity {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .tab {
+            display: none; /* Hide all tabs by default */
+        }
+        .tab.active {
+            display: block; /* Show active tab */
+        }
+        .tabs {
+            margin-bottom: 10px;
+        }
+        .tabs button {
+            margin-right: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Water Monitoring System</h1>
+    <div class="tabs">
+        <button onclick="showTab('currentData')">Current Data</button>
+        <button onclick="showTab('logs')">Logs</button>
+    </div>
+
+    <!-- Current Data Tab -->
+    <div id="currentData" class="tab active">
+        <div class="data">
+            <h2>Reservoir 1 Water Level:</h2>
+            <p id="water-level-1">Loading...</p>
+        </div>
+        <div class="data">
+            <h2>Reservoir 2 Water Level:</h2>
+            <p id="water-level-2">Loading...</p>
+        </div>
+        <div class="data">
+            <h2>Reservoir 2 pH Level:</h2>
+            <p id="ph-level">Loading...</p>
+        </div>
+        <div class="data">
+            <h2>Reservoir 2 Nutrient Concentration:</h2>
+            <p id="nutrient-concentration">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div id="logs" class="tab">
+        <h2>Reservoir and Pump Logs</h2>
+        <div id="reservoir1-logs">Loading Reservoir 1 Logs...</div>
+        <div id="reservoir2-logs">Loading Reservoir 2 Logs...</div>
+        <div id="pump-logs">Loading Pump Activity Logs...</div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const response = await fetch('http://localhost:3000/api/reservoirs');
+            const data = await response.json();
+            const latestData = data[0];
+
+            document.getElementById('water-level-1').innerText = latestData.water_level_1 + '%';
+            document.getElementById('water-level-2').innerText = latestData.water_level_2 + '%';
+            document.getElementById('ph-level').innerText = latestData.ph_level;
+            document.getElementById('nutrient-concentration').innerText = latestData.nutrient_concentration + ' ppm';
+        }
+
+        async function fetchLogs() {
+            const response = await fetch('http://localhost:3000/api/logs');
+            const logs = await response.json();
+            
+            // Populate logs
+            const reservoir1Logs = logs.reservoir1;
+            const reservoir2Logs = logs.reservoir2;
+            const pumpLogs = logs.pump;
+
+            document.getElementById('reservoir1-logs').innerHTML = `<h3>Reservoir 1 Logs</h3><pre>${JSON.stringify(reservoir1Logs, null, 2)}</pre>`;
+            document.getElementById('reservoir2-logs').innerHTML = `<h3>Reservoir 2 Logs</h3><pre>${JSON.stringify(reservoir2Logs, null, 2)}</pre>`;
+            document.getElementById('pump-logs').innerHTML = `<h3>Pump Activity Logs</h3><pre>${JSON.stringify(pumpLogs, null, 2)}</pre>`;
+        }
+
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'logs') {
+                fetchLogs(); // Fetch logs only when the logs tab is opened
+            }
+        }
+
+        // Fetch data every 5 seconds
+        setInterval(fetchData, 5000);
+        fetchData(); // Initial fetch
+    </script>
+</body>
+</html>

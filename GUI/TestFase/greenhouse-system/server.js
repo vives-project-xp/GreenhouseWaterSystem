@@ -9,9 +9,9 @@ app.use(cors());
 // Database configuratie
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root', // verander naar jouw MySQL-gebruiker
-    password: '', // voeg je MySQL-wachtwoord hier toe
-    database: 'greenhouse'
+    user: 'water_master', // verander naar jouw MySQL-gebruiker
+    password: 'GHWS4', // voeg je MySQL-wachtwoord hier toe
+    database: 'GHWS_Watermaster'
 });
 
 // Verbind met de MySQL-database
