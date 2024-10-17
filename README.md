@@ -1,4 +1,14 @@
 # GreenhouseWateringSystem
+## Planning
+
+* Database Ontwerpen
+* GUI ontwerpen om data op te displayen
+* Wheaterforcast programma ontwerpen
+  * Deze moet 
+* 
+* 
+
+
 
 ## Project Overview
 This project is a collaborative effort by our team to design and implement a high-tech, eco-friendly water management system for a greenhouse on our campus. The goal is to maximize the use of natural resources, such as rainwater, and create a sustainable, automated system that ensures the optimal growth environment for plants while minimizing water waste.
