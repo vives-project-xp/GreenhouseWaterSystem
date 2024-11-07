@@ -1,6 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const { exec } = require('child_process');
+
 
 const app = express();
 const port = 3000;
@@ -38,7 +40,6 @@ app.get('/api/reservoirs', (req, res) => {
             console.error('Error executing query:', err);
             return res.status(500).send('Internal Server Error');
         }
-        console.log('Query Results:', results);
         res.json(results);
     });
 });
@@ -67,6 +68,72 @@ app.get('/api/logs', (req, res) => {
         });
     });
 });
+
+// API endpoint to get the most recent rain prediction data for 1, 3, and 7 days
+app.get('/api/rain', (req, res) => {
+    const query = `
+        SELECT days_ahead, precipitation, created_at
+        FROM rain_prediction
+        WHERE created_at = (
+            SELECT MAX(created_at)
+            FROM rain_prediction AS r
+            WHERE r.days_ahead = rain_prediction.days_ahead
+        )
+        ORDER BY days_ahead ASC
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.json(results);
+    });
+});
+
+// New endpoint to save roof collection data with dynamic days_ahead
+app.post('/api/roof-collection', (req, res) => {
+    const { total_roof_collection_liters, days_ahead } = req.body;
+
+    if (total_roof_collection_liters === undefined || days_ahead === undefined) {
+        return res.status(400).send('Both total_roof_collection_liters and days_ahead are required');
+    }
+
+    const query = `
+        INSERT INTO rain_prediction (days_ahead, precipitation, created_at)
+        VALUES (?, ?, NOW())
+    `;
+
+    db.query(query, [days_ahead, total_roof_collection_liters], (err, result) => {
+        if (err) {
+            console.error('Error inserting roof collection data:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.status(200).send('Roof collection data saved successfully');
+    });
+});
+
+
+
+// POST request to trigger Python script
+app.post('/run-python', (req, res) => {
+    // Run the Python script here
+    exec('C:/Users/Thomas/miniconda3/python.exe ./WheatherForcast/HemelWaterToevoer.py', (err, stdout, stderr) => {
+        if (err) {
+            console.error(`Error: ${stderr}`);
+            return res.status(500).json({ message: 'Error executing Python script.' });
+        }
+
+        console.log(`Python script output: ${stdout}`);
+        res.status(200).json({ message: 'Python script executed successfully.' });
+    });
+});
+
+// Root route to respond at http://localhost:3000/
+app.get('/', (req, res) => {
+    res.send('Welcome to the Water Collection System API');
+});
+
 
 // Start the server
 app.listen(port, () => {

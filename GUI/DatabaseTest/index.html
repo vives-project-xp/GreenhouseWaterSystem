@@ -36,6 +36,7 @@
     <div class="tabs">
         <button onclick="showTab('currentData')">Current Data</button>
         <button onclick="showTab('logs')">Logs</button>
+        <button onclick="showTab('rainPrediction')">Rain Prediction</button> <!-- New Tab Button -->
     </div>
 
     <!-- Current Data Tab -->
@@ -66,6 +67,13 @@
         <div id="pump-logs">Loading Pump Activity Logs...</div>
     </div>
 
+    <div id="rainPrediction" class="tab">
+        <h2>Rain Prediction Data</h2>
+        <div id="rain-prediction-data">Loading Rain Prediction Data...</div>
+        <!-- Button to trigger Python script -->
+        <button id="runPythonScript">Run Python Script</button>
+    </div>
+
     <script>
         async function fetchData() {
             const response = await fetch('http://localhost:3000/api/reservoirs');
@@ -92,6 +100,16 @@
             document.getElementById('pump-logs').innerHTML = `<h3>Pump Activity Logs</h3><pre>${JSON.stringify(pumpLogs, null, 2)}</pre>`;
         }
 
+        async function fetchRainPrediction() {
+            const response = await fetch('http://localhost:3000/api/rain');
+            const rainData = await response.json();
+            const rainDataHtml = rainData.map(prediction => 
+                `<div>Days Ahead: ${prediction.days_ahead}, Prediction: ${prediction.precipitation} L, Date: ${new Date(prediction.created_at).toLocaleString()}</div>`
+            ).join('');
+            
+            document.getElementById('rain-prediction-data').innerHTML = rainDataHtml || 'No data available.';
+        }
+
         function showTab(tabName) {
             const tabs = document.querySelectorAll('.tab');
             tabs.forEach(tab => {
@@ -101,8 +119,26 @@
 
             if (tabName === 'logs') {
                 fetchLogs(); // Fetch logs only when the logs tab is opened
+            } else if (tabName === 'rainPrediction') {
+                fetchRainPrediction(); // Fetch rain predictions only when the rain prediction tab is opened
             }
         }
+                // This should be in the client-side script, which is part of your HTML
+        document.getElementById('runPythonScript').addEventListener('click', async () => {
+            try {
+                // Make an API request to run the Python script on the server side
+                const response = await fetch('http://localhost:3000/run-python', { method: 'POST' });
+                
+                if (response.ok) {
+                    alert('Python script executed successfully!');
+                } else {
+                    alert('Failed to execute Python script');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error occurred while running the Python script');
+            }
+        });
 
         // Fetch data every 5 seconds
         setInterval(fetchData, 5000);
