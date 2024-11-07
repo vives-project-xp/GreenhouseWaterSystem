@@ -10,7 +10,7 @@
   * Deze data dan versturen naar de database zodat deze ook kan worden displayed 
 * Water reservoir inhoud meten programma ontwerpen
    * Deze data ook doorsturen naar de database voor GUI
-* Aan de hand van de flotter sensoren een programma schrijven om de motor aan te sturen om tank 1 te legen in tank 2
+* Aan de hand van de vlotter sensoren een programma schrijven om de motor aan te sturen om tank 1 te legen in tank 2
 * Dan de EC en PH sensoren implementeren voor tank 2
   * Deze data dan ook bechikbaar maken op de GUI
 * Een Alert systeem ontwerpen voor waneer waarden te hoog of te laag zijn dat er een melding word gegeven
