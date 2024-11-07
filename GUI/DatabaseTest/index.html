@@ -4,58 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Monitoring System</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .data {
-            margin-bottom: 20px;
-        }
-        .pump-activity {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .tab {
-            display: none; /* Hide all tabs by default */
-        }
-        .tab.active {
-            display: block; /* Show active tab */
-        }
-        .tabs {
-            margin-bottom: 10px;
-        }
-        .tabs button {
-            margin-right: 10px;
-            padding: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="./styles/style.css">
+
 </head>
+
 <body>
     <h1>Water Monitoring System</h1>
     <div class="tabs">
-        <button onclick="showTab('currentData')">Current Data</button>
+        <button onclick="showTab('currentData')">Dashboard</button>
         <button onclick="showTab('logs')">Logs</button>
-        <button onclick="showTab('rainPrediction')">Rain Prediction</button> <!-- New Tab Button -->
+        <button id="runPythonScript">Rain Prediction</button> <!-- New Tab Button -->
+
     </div>
 
-    <!-- Current Data Tab -->
+    <!-- Dashboard Tab -->
     <div id="currentData" class="tab active">
-        <div class="data">
-            <h2>Reservoir 1 Water Level:</h2>
-            <p id="water-level-1">Loading...</p>
-        </div>
-        <div class="data">
-            <h2>Reservoir 2 Water Level:</h2>
-            <p id="water-level-2">Loading...</p>
-        </div>
-        <div class="data">
-            <h2>Reservoir 2 pH Level:</h2>
-            <p id="ph-level">Loading...</p>
-        </div>
-        <div class="data">
-            <h2>Reservoir 2 Nutrient Concentration:</h2>
-            <p id="nutrient-concentration">Loading...</p>
+        <div class="dashboard">
+            <!-- Reservoir 1 Block -->
+            <div class="card">
+                <h2>Reservoir 1</h2>
+                <p><strong>Water Level:</strong> <span id="water-level-1">Loading...</span></p>
+                <p><strong>Volume:</strong> <span id="water-volume-1">Loading...</span> liters</p> <!-- Volume in Liters -->
+            </div>
+
+            <!-- Reservoir 2 Block -->
+            <div class="card">
+                <h2>Reservoir 2</h2>
+                <p><strong>Water Level:</strong> <span id="water-level-2">Loading...</span></p>
+                <p><strong>Volume:</strong> <span id="water-volume-2">Loading...</span> liters</p> <!-- Volume in Liters -->
+
+            </div>
+            <div class="card">
+                <h2>Nutriënt & pH Status</h2>
+                <p><strong>pH Level:</strong> <span id="ph-level">Loading...</span></p>
+                <p><strong>Nutrient Concentration:</strong> <span id="nutrient-concentration">Loading...</span></p>
+            </div>
+            <!-- Rain Prediction Block -->
+            <div class="card">
+                <h2>Rain Prediction</h2>
+                <div id="rain-prediction-data">Loading Rain Prediction Data...</div>
+                <p id="rain-last-updated">Last updated: --</p> <!-- Display last updated time -->
+            </div>
         </div>
     </div>
 
@@ -67,24 +56,30 @@
         <div id="pump-logs">Loading Pump Activity Logs...</div>
     </div>
 
-    <div id="rainPrediction" class="tab">
-        <h2>Rain Prediction Data</h2>
-        <div id="rain-prediction-data">Loading Rain Prediction Data...</div>
-        <!-- Button to trigger Python script -->
-        <button id="runPythonScript">Run Python Script</button>
-    </div>
 
     <script>
         async function fetchData() {
             const response = await fetch('http://localhost:3000/api/reservoirs');
             const data = await response.json();
-            const latestData = data[0];
+            const latestData = data[0];  // Assuming you're fetching the latest data from the first object
 
+            // Set the water level percentages
             document.getElementById('water-level-1').innerText = latestData.water_level_1 + '%';
             document.getElementById('water-level-2').innerText = latestData.water_level_2 + '%';
+            
+            // Set the actual water volumes in liters
+            const volume1 = (latestData.water_level_1 / 100) *  50// Assuming you have capacity_1
+            const volume2 = (latestData.water_level_2 / 100) *  220// Assuming you have capacity_2
+
+            document.getElementById('water-volume-1').innerText = volume1.toFixed(2); // Display the volume with 2 decimal points
+            document.getElementById('water-volume-2').innerText = volume2.toFixed(2); // Display the volume with 2 decimal points
+
+            // Display other data
             document.getElementById('ph-level').innerText = latestData.ph_level;
             document.getElementById('nutrient-concentration').innerText = latestData.nutrient_concentration + ' ppm';
+            fetchRainPrediction(); // Fetch rain predictions every 5 seconds
         }
+
 
         async function fetchLogs() {
             const response = await fetch('http://localhost:3000/api/logs');
@@ -103,12 +98,25 @@
         async function fetchRainPrediction() {
             const response = await fetch('http://localhost:3000/api/rain');
             const rainData = await response.json();
-            const rainDataHtml = rainData.map(prediction => 
-                `<div>Days Ahead: ${prediction.days_ahead}, Prediction: ${prediction.precipitation} L, Date: ${new Date(prediction.created_at).toLocaleString()}</div>`
-            ).join('');
-            
-            document.getElementById('rain-prediction-data').innerHTML = rainDataHtml || 'No data available.';
+
+            if (rainData.length > 0) {
+                // Use the latest prediction's created_at field for the last updated time
+                const latestPrediction = rainData[0];
+                const lastUpdatedTime = new Date(latestPrediction.created_at).toLocaleString();
+
+                // Populate rain prediction data
+                const rainDataHtml = rainData.map(prediction => 
+                    `<div>In ${prediction.days_ahead} Day(s): Prediction: ${prediction.precipitation} L</div>`
+                ).join('');
+                
+                document.getElementById('rain-prediction-data').innerHTML = rainDataHtml;
+                document.getElementById('rain-last-updated').innerText = `Last updated: ${lastUpdatedTime}`;
+            } else {
+                document.getElementById('rain-prediction-data').innerHTML = 'No data available.';
+                document.getElementById('rain-last-updated').innerText = 'Last updated: --';
+            }
         }
+
 
         function showTab(tabName) {
             const tabs = document.querySelectorAll('.tab');
@@ -130,13 +138,14 @@
                 const response = await fetch('http://localhost:3000/run-python', { method: 'POST' });
                 
                 if (response.ok) {
-                    alert('Python script executed successfully!');
+                    //alert('Python script executed successfully!');
                 } else {
-                    alert('Failed to execute Python script');
+                    //alert('Failed to execute Python script');
                 }
+                fetchRainPrediction(); // Fetch rain predictions after running the Python script
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error occurred while running the Python script');
+                //alert('Error occurred while running the Python script');
             }
         });
 

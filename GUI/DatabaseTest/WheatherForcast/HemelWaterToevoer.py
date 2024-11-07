@@ -31,14 +31,14 @@ roof_collection_3_days = total_precipitation_3_days * SURFACE_AREA
 roof_collection_7_days = total_precipitation_7_days * SURFACE_AREA
 
 # Display results
-print(f"Total precipitation for the next 1 day: {total_precipitation_1_day} mm")
-print(f"Total roof collection for 1 day: {roof_collection_1_day} liters")
-
-print(f"Total precipitation for the next 3 days: {total_precipitation_3_days} mm")
-print(f"Total roof collection for 3 days: {roof_collection_3_days} liters")
-
-print(f"Total precipitation for the next 7 days: {total_precipitation_7_days} mm")
-print(f"Total roof collection for 7 days: {roof_collection_7_days} liters")
+#print(f"Total precipitation for the next 1 day: {total_precipitation_1_day} mm")
+#print(f"Total roof collection for 1 day: {roof_collection_1_day} liters")
+#
+#print(f"Total precipitation for the next 3 days: {total_precipitation_3_days} mm")
+#print(f"Total roof collection for 3 days: {roof_collection_3_days} liters")
+#
+#print(f"Total precipitation for the next 7 days: {total_precipitation_7_days} mm")
+#print(f"Total roof collection for 7 days: {roof_collection_7_days} liters")
 
 # Send data to the Express server for each forecast
 url = 'http://localhost:3000/api/roof-collection'

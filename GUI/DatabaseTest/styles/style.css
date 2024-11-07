@@ -1,0 +1,173 @@
+/* Variables */
+:root {
+    --primary-color: #4a90e2;
+    --background-color: #f9f9f9;
+    --font-color: #333;
+    --card-bg: #fff;
+    --border-radius: 8px;
+    --padding: 15px;
+    --margin: 20px;
+  }
+  
+  /* General styling */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--font-color);
+    margin: 0;
+    padding: var(--margin);
+  }
+  
+  h1 {
+    color: var(--primary-color);
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: var(--margin);
+  }
+  
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--margin);
+  }
+  
+  .tabs button {
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+    padding: 10px 15px;
+    margin: 0 5px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+  }
+  
+  .tabs button:hover {
+    background-color: #357ab8;
+  }
+  
+  .tabs button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+  }
+  
+  /* Dashboard layout */
+  .dashboard {
+    display: flex;
+    gap: var(--margin);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  /* Card styles */
+  .card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: var(--padding);
+    flex: 1 1 300px;
+    max-width: 320px;
+    margin: var(--margin) 0;
+  }
+  
+  .card h2 {
+    color: var(--primary-color);
+    font-size: 1.4em;
+    margin-bottom: 10px;
+  }
+  
+  .card p {
+    font-size: 1em;
+    margin: 8px 0;
+  }
+  
+  .card button {
+    margin-top: var(--margin);
+    padding: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .card button:hover {
+    background-color: #357ab8;
+  }
+  
+  /* Tab content */
+  .tab {
+    display: none;
+    padding: var(--padding);
+  }
+  
+  .tab.active {
+    display: block;
+  }
+  
+  /* Logs styling */
+  #logs h2 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-bottom: var(--padding);
+  }
+  
+  #logs pre {
+    background-color: #f0f0f0;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 10px 0;
+  }
+  
+  /* rain prediction tab styling */
+
+  #rainPrediction h2 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-bottom: var(--padding);
+  }
+
+  #rainPrediction p {
+    font-size: 1em;
+    margin: 8px 0;
+  }
+
+  #rainPrediction button {
+    margin-top: var(--margin);
+    padding: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #rain-prediction button:hover {
+    background-color: #357ab8;
+  }
+
+
+  
+  /* Responsive styling */
+  @media (max-width: 600px) {
+    .dashboard {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .tabs {
+      flex-direction: column;
+    }
+  
+    .tabs button {
+      margin: 5px 0;
+      width: 100%;
+    }
+  }
+  
