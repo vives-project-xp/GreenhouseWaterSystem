@@ -27,6 +27,12 @@
 
 ### Hardware 
 
+*afvoer van regenwater van serre naar reservoir.
+*elektrisch circuit van pomp aangestuurd door relais.
+*microcontroller en sensoren voor kwaliteit van water.
+*microcontroller en sensoren voor volume water.
+*microcontroller voor weersvoorspellingen.
+*afvoer voor overtollig water.
 ...
 
 
