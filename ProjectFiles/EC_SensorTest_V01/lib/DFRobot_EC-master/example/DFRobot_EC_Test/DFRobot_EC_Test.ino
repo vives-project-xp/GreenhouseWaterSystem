@@ -20,7 +20,7 @@
 #include "DFRobot_EC.h"
 #include <EEPROM.h>
 
-#define EC_PIN A1
+#define EC_PIN 1
 float voltage,ecValue,temperature = 25;
 DFRobot_EC ec;
 
