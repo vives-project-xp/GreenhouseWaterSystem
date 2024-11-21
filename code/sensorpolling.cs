@@ -1,94 +1,95 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace Vlotter_program_v1
 {
-    internal class Class1
+    internal class ReservoirMonitor
     {
-        //This is a class to read out multiple vlotter sensors to determine the value of a water reservoir
+        // Sensoren voor reservoir 1
+        private int sensor_Low_reservoir1 = 1;  // 10L
+        private int sensor_Mid_reservoir1 = 2;  // 25L
+        private int sensor_High_reservoir1 = 3; // 40L
 
-        //variables
-        private int trigger_Ph_sensor = 0;
+        // Sensoren voor reservoir 2
+        private int sensor_Empty_reservoir2 = 4;  // 20L
+        private int sensor_Low_reservoir2 = 5;    // 50L
+        private int sensor_Mid_reservoir2 = 6;    // 150L
+        private int sensor_High_reservoir2 = 7;   // 200L
+        private int sensor_Ph = 8;                // pH sensor
+        private int sensor_EC = 9;                // EC sensor
 
-        private int sensor_Low_reservoir1 = 1; //sensor for 10l left
-        private int sensor_Mid_reservoir1 = 2; //sensor for 25l left
-        private int sensor_High_reservoir1 = 3; //sensor for 40l left
+        // Databaseconfiguratie
+        private string connectionString = "Server=localhost;Database=water_collection_system;Uid=water_master;Pwd=GHWS4;";
 
-        private int sensor_Empty_reservoir2 = 4; //sensor for 20l left
-        private int sensor_Low_reservoir2 = 5; //sensor for 50l left
-        private int sensor_Mid_reservoir2 = 6; //sensor for 150l left
-        private int sensor_High_reservoir2 = 7; //sensor for 200l left
-
-        //analog sensor for Ph value of water
-        private int sensor_Ph = A1;
-        private int sensor_EC = A2;
-
-        //poll the sensors
-        private void pollSensors()
+        // Methode om waterniveau van reservoir 1 op te slaan
+        public void SaveReservoir1Data(float waterLevelPercentage)
         {
-            trigger_Ph_sensor = 1;
-            //read the sensors
-            int Ph_value = analogRead(sensor_Ph);
-            int EC_value = analogRead(sensor_EC);
-            //send the values to the user
-            Serial.println("Ph value: " + Ph_value);
-            Serial.println("EC value: " + EC_value);
-        }
-        //poll sensors for reservoir 1
-        private void pollSensorsReservoir1()
-        {
-            //read the sensors
-            int Low_reservoir1_value = digitalRead(sensor_Low_reservoir1);
-            int Mid_reservoir1_value = digitalRead(sensor_Mid_reservoir1);
-            int High_reservoir1_value = digitalRead(sensor_High_reservoir1);
-            
-            int Empty_reservoir2_value = digitalRead(sensor_Empty_reservoir2);
-            int Low_reservoir2_value = digitalRead(sensor_Low_reservoir2);
-            int Mid_reservoir2_value = digitalRead(sensor_Mid_reservoir2);
-            int High_reservoir2_value = digitalRead(sensor_High_reservoir2);
-
-
-
-            if (Low_reservoir1_value == 0)
+            using (var connection = new MySqlConnection(connectionString))
             {
-                //send a message to the user that the reservoir is almost empty
-                Serial.println("Reservoir 1 is almost empty (10l left)");
-            }
-            else if (Mid_reservoir1_value == 0)
-            {
-                //send a message to the user that the reservoir is half full
-                Serial.println("Reservoir 1 is half full (25l left)");
-            }
-            else if (High_reservoir1_value == 0)
-            {
-                //send a message to the user that the reservoir is full
-                Serial.println("Reservoir 1 is full (40l left)");
-            }
-
-            if (Empty_reservoir2_value == 0)
-            {
-                //send a message to the user that the reservoir is empty
-                Serial.println("Reservoir 2 is almost empty (20l left)");
-            }
-            else if (Low_reservoir2_value == 0)
-            {
-                //send a message to the user that the reservoir is almost empty
-                Serial.println("Reservoir 2 is almost empty (50l left)");
-            }
-            else if (Mid_reservoir2_value == 0)
-            {
-                //send a message to the user that the reservoir is half full
-                Serial.println("Reservoir 2 is half full (150l left)");
-            }
-            else if (High_reservoir2_value == 0)
-            {
-                //send a message to the user that the reservoir is full
-                Serial.println("Reservoir 2 is full (200l left)");
+                connection.Open();
+                string query = "INSERT INTO reservoir_1 (water_level) VALUES (@waterLevel)";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@waterLevel", waterLevelPercentage);
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
+        // Methode om waterniveau en pH van reservoir 2 op te slaan
+        public void SaveReservoir2Data(float waterLevelPercentage, float ph, float nutrientConcentration)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO reservoir_2 (water_level, ph_level, nutrient_concentration) VALUES (@waterLevel, @ph, @nutrientConcentration)";
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@waterLevel", waterLevelPercentage);
+                    command.Parameters.AddWithValue("@ph", ph);
+                    command.Parameters.AddWithValue("@nutrientConcentration", nutrientConcentration);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Simulatie van het uitlezen van sensoren en opslaan in de database
+        public void PollAndSaveData()
+        {
+            // Lees waterniveau van reservoir 1
+            float waterLevelReservoir1 = ReadReservoir1();
+            SaveReservoir1Data(waterLevelReservoir1);
+
+            // Lees waterniveau en pH van reservoir 2
+            float waterLevelReservoir2 = ReadReservoir2();
+            float phLevel = ReadPhSensor();
+            float nutrientConcentration = ReadECSensor();
+            SaveReservoir2Data(waterLevelReservoir2, phLevel, nutrientConcentration);
+        }
+
+        // Simulatiemethoden voor het uitlezen van sensoren
+        private float ReadReservoir1()
+        {
+            // Simuleer waterniveau als percentage
+            return 70.0f; // Voorbeeldwaarde
+        }
+
+        private float ReadReservoir2()
+        {
+            // Simuleer waterniveau als percentage
+            return 85.0f; // Voorbeeldwaarde
+        }
+
+        private float ReadPhSensor()
+        {
+            // Simuleer pH-waarde
+            return 7.2f; // Voorbeeldwaarde
+        }
+
+        private float ReadECSensor()
+        {
+            // Simuleer EC-concentratie
+            return 500.0f; // Voorbeeldwaarde
+        }
     }
 }

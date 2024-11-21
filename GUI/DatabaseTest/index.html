@@ -48,6 +48,13 @@
                 <div id="rain-prediction-data">Loading Rain Prediction Data...</div>
                 <p id="rain-last-updated">Last updated: --</p> <!-- Display last updated time -->
             </div>
+            <div class="card">
+                <h2>Pump Status</h2>
+                <p><strong>Last Pump On:</strong> <span id="pump-last-on">Loading...</span></p>
+                <p><strong>Last Pump Duration:</strong> <span id="pump-duration">Loading...</span> seconds</p>
+                <button id="start-pump-button" onclick="startPump()">Start Pump</button>
+            </div>
+            
         </div>
     </div>
 
@@ -80,7 +87,9 @@
             // Display other data
             document.getElementById('ph-level').innerText = latestData.ph_level;
             document.getElementById('nutrient-concentration').innerText = latestData.nutrient_concentration + ' ppm';
-            fetchRainPrediction(); // Fetch rain predictions every 5 seconds
+            fetchRainPrediction();
+            fetchPumpData(); 
+
         }
 
 
@@ -184,6 +193,33 @@
             button.innerText = `${day} Day${day > 1 ? 's' : ''}`;
             button.className = `day-button ${day === 1 ? 'one-day' : day === 3 ? 'three-day' : 'seven-day'}`;
         }
+        async function fetchPumpData() {
+        const response = await fetch('http://localhost:3000/api/pump-status');
+        const pumpData = await response.json();
+
+        if (pumpData) {
+            document.getElementById('pump-last-on').innerText = pumpData.lastOn || 'N/A';
+            document.getElementById('pump-duration').innerText = pumpData.duration || 'N/A';
+        } else {
+            document.getElementById('pump-last-on').innerText = 'No Data';
+            document.getElementById('pump-duration').innerText = 'No Data';
+        }   
+    }      
+
+    // Trigger pump via a C# script
+    async function startPump() {
+        try {
+            const response = await fetch('http://localhost:3000/start-pump', { method: 'POST' });
+            if (response.ok) {
+                alert('Pump started successfully!');
+            } else {
+                alert('Failed to start the pump.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error occurred while starting the pump.');
+        }
+    }
 
         // Fetch data every 5 seconds
         setInterval(fetchData, 5000);

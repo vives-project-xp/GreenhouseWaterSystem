@@ -21,9 +21,9 @@ hours_3_days = 72
 hours_7_days = 168
 
 # Calculate total precipitation for each period in mm
-total_precipitation_1_day = data_filtered['rain'].iloc[:hours_1_day].sum()
-total_precipitation_3_days = data_filtered['rain'].iloc[:hours_3_days].sum()
-total_precipitation_7_days = data_filtered['rain'].iloc[:hours_7_days].sum()
+total_precipitation_1_day = data_filtered['precipitation'].iloc[:hours_1_day].sum()
+total_precipitation_3_days = data_filtered['precipitation'].iloc[:hours_3_days].sum()
+total_precipitation_7_days = data_filtered['precipitation'].iloc[:hours_7_days].sum()
 
 # Calculate roof collection in liters for each period
 roof_collection_1_day = total_precipitation_1_day * SURFACE_AREA

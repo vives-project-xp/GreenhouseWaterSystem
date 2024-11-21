@@ -129,6 +129,56 @@ app.post('/run-python', (req, res) => {
     });
 });
 
+app.get('/api/pump-status', (req, res) => {
+    const query = `
+        SELECT timestamp_on AS lastOn, timestamp_off AS lastOff, duration
+        FROM pump_activity
+        ORDER BY timestamp_on DESC
+        LIMIT 1
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Error fetching pump status:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+
+        if (results.length > 0) {
+            const rawData = results[0];
+
+            // Format the date
+            const lastOnDate = new Date(rawData.lastOn);
+            const formattedLastOn = `${String(lastOnDate.getDate()).padStart(2, '0')}/${String(lastOnDate.getMonth() + 1).padStart(2, '0')}/${lastOnDate.getFullYear()} ${String(lastOnDate.getHours()).padStart(2, '0')}:${String(lastOnDate.getMinutes()).padStart(2, '0')}:${String(lastOnDate.getSeconds()).padStart(2, '0')}`;
+
+            // Log and respond with formatted data
+            const response = {
+                lastOn: formattedLastOn,
+                duration: rawData.duration
+            };
+
+            console.log('Pump Status Data:', response); // Log the formatted data
+            res.json(response);
+        } else {
+            console.log('No pump data available'); // Log if no data found
+            res.json(null);
+        }
+    });
+});
+
+
+app.post('/start-pump', (req, res) => {
+    exec('path/to/your/CSharpPumpScript.exe', (err, stdout, stderr) => {
+        if (err) {
+            console.error(`Error starting pump: ${stderr}`);
+            return res.status(500).json({ message: 'Failed to start pump.' });
+        }
+        console.log(`Pump started: ${stdout}`);
+        res.status(200).json({ message: 'Pump started successfully.' });
+    });
+});
+
+
+
 // Root route to respond at http://localhost:3000/
 app.get('/', (req, res) => {
     res.send('Welcome to the Water Collection System API');
