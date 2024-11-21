@@ -54,4 +54,4 @@ pd.set_option('display.width', None)  # Prevent line wrapping
 hourly_dataframe = pd.DataFrame(data = hourly_data)
 # Save the hourly dataframe to a CSV file
 hourly_dataframe.to_csv('hourly_precipitation_data.csv', index=False)
-#print(hourly_dataframe)
+print(hourly_dataframe)

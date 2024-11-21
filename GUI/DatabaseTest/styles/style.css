@@ -1,12 +1,16 @@
 /* Variables */
 :root {
-    --primary-color: #4a90e2;
-    --background-color: #f9f9f9;
-    --font-color: #333;
-    --card-bg: #fff;
+    --primary-color: #3cc743;
+    --background-color: #1c1c1c;
+    --font-color: #f0f0f0;
+    --card-bg: #333;
+    --oneDay-color: #ffeb3b; /* Bright yellow */
+    --threeDay-color: #4a90e2; /* Lighter blue */
+    --sevenDay-color: #ff5252; /* Lighter red */
     --border-radius: 8px;
     --padding: 15px;
     --margin: 20px;
+
   }
   
   /* General styling */
@@ -63,13 +67,14 @@
   
   /* Card styles */
   .card {
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: var(--padding);
-    flex: 1 1 300px;
-    max-width: 320px;
-    margin: var(--margin) 0;
+      background-color: var(--card-bg);
+      color: var(--font-color);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      padding: var(--padding);
+      flex: 1 1 300px;
+      max-width: 320px;
+      margin: var(--margin) 0;
   }
   
   .card h2 {
@@ -116,12 +121,13 @@
   }
   
   #logs pre {
-    background-color: #f0f0f0;
+    background-color: var(--card-bg);
     padding: var(--padding);
     border-radius: var(--border-radius);
     white-space: pre-wrap;
     word-wrap: break-word;
     margin: 10px 0;
+    color: var(--font-color);
   }
   
   /* rain prediction tab styling */
@@ -170,4 +176,26 @@
       width: 100%;
     }
   }
+
+.one-day {
+    color: var(--oneDay-color);
+}
+
+.three-day {
+    color: var(--threeDay-color);
+}
+
+.seven-day {
+    color: var(--sevenDay-color);
+}
+
+.day-button {
+  /* Basic button styling */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
   

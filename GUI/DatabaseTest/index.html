@@ -25,6 +25,8 @@
                 <h2>Reservoir 1</h2>
                 <p><strong>Water Level:</strong> <span id="water-level-1">Loading...</span></p>
                 <p><strong>Volume:</strong> <span id="water-volume-1">Loading...</span> liters</p> <!-- Volume in Liters -->
+                <button id="rain-cycle-button" class="day-button one-day" onclick="cycleRainPrediction()">1</button>
+
             </div>
 
             <!-- Reservoir 2 Block -->
@@ -32,6 +34,7 @@
                 <h2>Reservoir 2</h2>
                 <p><strong>Water Level:</strong> <span id="water-level-2">Loading...</span></p>
                 <p><strong>Volume:</strong> <span id="water-volume-2">Loading...</span> liters</p> <!-- Volume in Liters -->
+                <button id="rain-cycle-button" class="day-button one-day" onclick="cycleRainPrediction()">1</button>
 
             </div>
             <div class="card">
@@ -104,11 +107,20 @@
                 const latestPrediction = rainData[0];
                 const lastUpdatedTime = new Date(latestPrediction.created_at).toLocaleString();
 
-                // Populate rain prediction data
-                const rainDataHtml = rainData.map(prediction => 
-                    `<div>In ${prediction.days_ahead} Day(s): Prediction: ${prediction.precipitation} L</div>`
-                ).join('');
-                
+                // Populate rain prediction data with color-coded classes
+                const rainDataHtml = rainData.map(prediction => {
+                    let colorClass = ''; // Determine color class based on days_ahead
+                    if (prediction.days_ahead === 1) {
+                        colorClass = 'one-day';
+                    } else if (prediction.days_ahead === 3) {
+                        colorClass = 'three-day';
+                    } else if (prediction.days_ahead === 7) {
+                        colorClass = 'seven-day';
+                    }
+                    
+                    return `<div class="${colorClass}">In ${prediction.days_ahead} Day(s): Prediction: ${prediction.precipitation} L</div>`;
+                }).join('');
+
                 document.getElementById('rain-prediction-data').innerHTML = rainDataHtml;
                 document.getElementById('rain-last-updated').innerText = `Last updated: ${lastUpdatedTime}`;
             } else {
@@ -116,6 +128,7 @@
                 document.getElementById('rain-last-updated').innerText = 'Last updated: --';
             }
         }
+
 
 
         function showTab(tabName) {
@@ -148,6 +161,29 @@
                 //alert('Error occurred while running the Python script');
             }
         });
+
+        // Function to cycle day for the reservoir data
+        function cycleReservoirData(reservoirId) {
+            // Cycle day: 1 -> 3 -> 7 -> 1
+            if (currentDay[`reservoir-${reservoirId}`] === 1) {
+                currentDay[`reservoir-${reservoirId}`] = 3;
+            } else if (currentDay[`reservoir-${reservoirId}`] === 3) {
+                currentDay[`reservoir-${reservoirId}`] = 7;
+            } else {
+                currentDay[`reservoir-${reservoirId}`] = 1;
+            }
+
+            // Get new day data and update display
+            const day = currentDay[`reservoir-${reservoirId}`];
+            const data = reservoirData[`reservoir-${reservoirId}`][day];
+            document.getElementById(`water-level-${reservoirId}`).innerText = `${data.water_level}%`;
+            document.getElementById(`water-volume-${reservoirId}`).innerText = `${data.volume.toFixed(2)}`;
+
+            // Update button text and color
+            const button = document.getElementById(`cycle-button-${reservoirId}`);
+            button.innerText = `${day} Day${day > 1 ? 's' : ''}`;
+            button.className = `day-button ${day === 1 ? 'one-day' : day === 3 ? 'three-day' : 'seven-day'}`;
+        }
 
         // Fetch data every 5 seconds
         setInterval(fetchData, 5000);
