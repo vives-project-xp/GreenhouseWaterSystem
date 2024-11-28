@@ -1,28 +1,35 @@
 #include <Arduino.h>
 
 
-#define sensor_Empty_reservoir 0 //sensor for 20l left
-#define sensor_Low_reservoir  1 //sensor for 50l left
-#define sensor_Mid_reservoir  2 //sensor for 150l left
-#define sensor_High_reservoir 3 //sensor for 200l left
+#define sensor_Empty_reservoir_1 0 //sensor for 35 left
+#define sensor_Low_reservoir_1  1 //sensor for 80 left
+#define sensor_Mid_reservoir_1  2 //sensor for 165 left
+#define sensor_High_reservoir_1 3 //sensor for 210 left
 #define pH_sensor 4 //sensor for pH
 #define relay 5 //relay for pump
+#define sensor_Low_reservoir_0 6 //sensor for 25 left
+#define sensor_Mid_reservoir_0  7 //sensor for 70 left
+#define sensor_High_reservoir_0  8 //sensor for 185 left
 float calibration_value = 21.34 + 0.7;
 unsigned long int avgValue;  //Store the average value of the sensor feedback
 int buf[10], temp;
 
 // put function declarations here:
-void pollSensorsReservoir();
+void pollSensorsReservoir_1();
+void pollSensorsReservoir_0();
 void pollSensorspH();
 void relayControl();
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(sensor_Empty_reservoir, INPUT);
-  pinMode(sensor_Low_reservoir, INPUT);
-  pinMode(sensor_Mid_reservoir, INPUT);
-  pinMode(sensor_High_reservoir, INPUT);
+  pinMode(sensor_Empty_reservoir_1, INPUT);
+  pinMode(sensor_Low_reservoir_1, INPUT);
+  pinMode(sensor_Mid_reservoir_1, INPUT);
+  pinMode(sensor_High_reservoir_1, INPUT);
+  pinMode(sensor_Low_reservoir_0, INPUT);
+  pinMode(sensor_Mid_reservoir_0, INPUT);
+  pinMode(sensor_High_reservoir_0, INPUT);
   pinMode(pH_sensor, INPUT);
   pinMode(relay, OUTPUT);
 }
@@ -30,30 +37,33 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   relayControl();
+  pollSensorsReservoir_1();
+  pollSensorsReservoir_0();
   
 }
 
 // put function definitions here:
-void pollSensorsReservoir()
+void pollSensorsReservoir_1()
 {
-  int sensor_Empty_reservoir_value = digitalRead(sensor_Empty_reservoir);
-  int sensor_Low_reservoir_value = digitalRead(sensor_Low_reservoir);
-  int sensor_Mid_reservoir_value = digitalRead(sensor_Mid_reservoir);
-  int sensor_High_reservoir_value = digitalRead(sensor_High_reservoir);
+  int sensor_Empty_reservoir_1_value = digitalRead(sensor_Empty_reservoir_1);
+  int sensor_Low_reservoir_1_value = digitalRead(sensor_Low_reservoir_1);
+  int sensor_Mid_reservoir_1_value = digitalRead(sensor_Mid_reservoir_1);
+  int sensor_High_reservoir_1_value = digitalRead(sensor_High_reservoir_1);
 
-  if(sensor_High_reservoir_value == 1)
+  Serial.print("Reservoir 1: ");
+  if(sensor_High_reservoir_1_value == 1)
   {
     Serial.println("210l left");
   }
-  else if(sensor_Mid_reservoir_value == 1)
+  else if(sensor_Mid_reservoir_1_value == 1)
   {
     Serial.println("135l left");
   }
-  else if(sensor_Low_reservoir_value == 1)
+  else if(sensor_Low_reservoir_1_value == 1)
   {
     Serial.println("70l left");
   }
-  else if(sensor_Empty_reservoir_value == 1)
+  else if(sensor_Empty_reservoir_1_value == 1)
   {
     Serial.println("25l left");
   }
@@ -63,6 +73,30 @@ void pollSensorsReservoir()
   }
 }
 
+void pollSensorsReservoir_0()
+{
+  int sensor_Low_reservoir_0_value = digitalRead(sensor_Low_reservoir_0);
+  int sensor_Mid_reservoir_0_value = digitalRead(sensor_Mid_reservoir_0);
+  int sensor_High_reservoir_0_value = digitalRead(sensor_High_reservoir_0);
+
+  Serial.print("Reservoir 0: ");
+  if(sensor_High_reservoir_0_value == 1)
+  {
+    Serial.println("70l left");
+  }
+  else if(sensor_Mid_reservoir_0_value == 1)
+  {
+    Serial.println("50l left");
+  }
+  else if(sensor_Low_reservoir_0_value == 1)
+  {
+    Serial.println("25l left");
+  }
+  else
+  {
+    Serial.println("0l left");
+  }
+}
 void pollSensorspH()
 {
   for(int i=0;i<10;i++){ //Get 10 sample value from the sensor for smooth the value
@@ -98,8 +132,30 @@ void pollSensorspH()
 
 void relayControl()
 {
-  digitalWrite(relay, HIGH);
-  delay(5000);
-  digitalWrite(relay, LOW);
-  delay(5000);
+  // Read sensors for Reservoir 0
+  int sensor_High_reservoir_0_value = digitalRead(sensor_High_reservoir_0);
+  int sensor_Low_reservoir_0_value = digitalRead(sensor_Low_reservoir_0);
+
+  // Read sensors for Reservoir 1
+  int sensor_High_reservoir_1_value = digitalRead(sensor_High_reservoir_1);
+  int sensor_Empty_reservoir_1_value = digitalRead(sensor_Empty_reservoir_1);
+
+  static bool pumpOn = false;
+
+  if (!pumpOn) {
+    // Check conditions to turn the pump ON
+    if (sensor_High_reservoir_0_value == HIGH || sensor_Empty_reservoir_1_value == LOW) {
+      digitalWrite(relay, HIGH);
+      pumpOn = true;
+      Serial.println("Pump ON");
+    }
+  } else {
+    // Check conditions to turn the pump OFF
+    if (sensor_Low_reservoir_0_value == LOW || sensor_High_reservoir_1_value == HIGH) {
+      digitalWrite(relay, LOW);
+      pumpOn = false;
+      Serial.println("Pump OFF");
+    }
+  }
 }
+
