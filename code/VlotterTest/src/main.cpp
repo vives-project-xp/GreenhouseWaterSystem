@@ -37,7 +37,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   relayControl();
-
+  pollSensorsReservoir_1();
+  pollSensorsReservoir_0();
   
 }
 
@@ -48,11 +49,8 @@ void pollSensorsReservoir_1()
   int sensor_Low_reservoir_1_value = digitalRead(sensor_Low_reservoir_1);
   int sensor_Mid_reservoir_1_value = digitalRead(sensor_Mid_reservoir_1);
   int sensor_High_reservoir_1_value = digitalRead(sensor_High_reservoir_1);
-  int sensor_Low_reservoir_0_value = digitalRead(sensor_Low_reservoir_0);
-  int sensor_Mid_reservoir_0_value = digitalRead(sensor_Mid_reservoir_0);
-  int sensor_High_reservoir_0_value = digitalRead(sensor_High_reservoir_0);
 
-
+  Serial.print("Reservoir 1: ");
   if(sensor_High_reservoir_1_value == 1)
   {
     Serial.println("210l left");
@@ -75,6 +73,30 @@ void pollSensorsReservoir_1()
   }
 }
 
+void pollSensorsReservoir_0()
+{
+  int sensor_Low_reservoir_0_value = digitalRead(sensor_Low_reservoir_0);
+  int sensor_Mid_reservoir_0_value = digitalRead(sensor_Mid_reservoir_0);
+  int sensor_High_reservoir_0_value = digitalRead(sensor_High_reservoir_0);
+
+  Serial.print("Reservoir 0: ");
+  if(sensor_High_reservoir_0_value == 1)
+  {
+    Serial.println("70l left");
+  }
+  else if(sensor_Mid_reservoir_0_value == 1)
+  {
+    Serial.println("50l left");
+  }
+  else if(sensor_Low_reservoir_0_value == 1)
+  {
+    Serial.println("25l left");
+  }
+  else
+  {
+    Serial.println("0l left");
+  }
+}
 void pollSensorspH()
 {
   for(int i=0;i<10;i++){ //Get 10 sample value from the sensor for smooth the value
@@ -129,7 +151,7 @@ void relayControl()
     }
   } else {
     // Check conditions to turn the pump OFF
-    if (sensor_Low_reservoir_0_value == LOW && sensor_High_reservoir_1_value == HIGH) {
+    if (sensor_Low_reservoir_0_value == LOW || sensor_High_reservoir_1_value == HIGH) {
       digitalWrite(relay, LOW);
       pumpOn = false;
       Serial.println("Pump OFF");
