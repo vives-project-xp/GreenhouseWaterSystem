@@ -39,6 +39,7 @@ void loop() {
   relayControl();
   pollSensorsReservoir_1();
   pollSensorsReservoir_0();
+  delay(1000);
   
 }
 
@@ -142,9 +143,9 @@ void relayControl()
 
   static bool pumpOn = false;
 
-  if (!pumpOn) {
+  if (pumpOn == false) {
     // Check conditions to turn the pump ON
-    if (sensor_High_reservoir_0_value == HIGH || sensor_Empty_reservoir_1_value == LOW) {
+    if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW) || (sensor_Empty_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH)) {
       digitalWrite(relay, HIGH);
       pumpOn = true;
       Serial.println("Pump ON");
