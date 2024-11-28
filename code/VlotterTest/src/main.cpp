@@ -14,16 +14,16 @@
 
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
-const String serverURL = "http://your_server_ip:3000"; // Replace with your server's IP
+const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
 
 float calibration_value = 21.34 + 0.7;
 unsigned long int avgValue;  // Store the average value of the sensor feedback
 int buf[10], temp;
 
 // Function declarations:
-void pollSensorsReservoir_1();
-void pollSensorsReservoir_0();
-void pollSensorspH();
+int pollSensorsReservoir_1();
+int pollSensorsReservoir_0();
+float pollSensorspH();
 void relayControl();
 void connectToWiFi();
 void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phValue);
@@ -48,14 +48,10 @@ void loop() {
   relayControl();
   pollSensorsReservoir_1();
   pollSensorsReservoir_0();
-<<<<<<< HEAD
-  delay(1000);
-=======
   pollSensorspH();
->>>>>>> 1329779d1514f02bb7e88924ed188c161d9aa727
   
   // After polling, send data to the server
-  sendDataToServer(50, 60, 6.5);
+  sendDataToServer(10, 60, 6.5);
   
   delay(5000); // Delay to avoid spamming requests, adjust as needed
 }
@@ -77,7 +73,6 @@ int pollSensorsReservoir_1() {
   int sensor_Mid_reservoir_1_value = digitalRead(sensor_Mid_reservoir_1);
   int sensor_High_reservoir_1_value = digitalRead(sensor_High_reservoir_1);
 
-<<<<<<< HEAD
   Serial.print("Reservoir 1: ");
   if(sensor_High_reservoir_1_value == 1)
   {
@@ -98,16 +93,6 @@ int pollSensorsReservoir_1() {
   else
   {
     Serial.println("<25l left");
-=======
-  if(sensor_High_reservoir_1_value == 1) {
-    return 210; // Reservoir 1 is full
-  } else if(sensor_Mid_reservoir_1_value == 1) {
-    return 135;
-  } else if(sensor_Low_reservoir_1_value == 1) {
-    return 70;
-  } else if(sensor_Empty_reservoir_1_value == 1) {
-    return 25;
->>>>>>> 1329779d1514f02bb7e88924ed188c161d9aa727
   }
   return 0; // Empty reservoir
 }
@@ -163,14 +148,9 @@ void relayControl() {
 
   static bool pumpOn = false;
 
-<<<<<<< HEAD
   if (pumpOn == false) {
     // Check conditions to turn the pump ON
     if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW) || (sensor_Empty_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH)) {
-=======
-  if (!pumpOn) {
-    if (sensor_High_reservoir_0_value == HIGH || sensor_Empty_reservoir_1_value == LOW) {
->>>>>>> 1329779d1514f02bb7e88924ed188c161d9aa727
       digitalWrite(relay, HIGH);
       pumpOn = true;
       Serial.println("Pump ON");
@@ -206,6 +186,7 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phVa
       Serial.print("Error sending data: ");
       Serial.println(httpResponseCode);
     }
+    http.end();
 
     // Send Reservoir 2 and pH data
     url = serverURL + "/api/reservoir2-fill"; // Change this to the appropriate endpoint
@@ -216,9 +197,13 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phVa
     payload += ", \"nutrient_concentration\": " + String(420); // Example nutrient concentration
     payload += "}";
 
+    Serial.println(payload);
+    
+
     httpResponseCode = http.POST(payload);
 
     if (httpResponseCode > 0) {
+      Serial.println(httpResponseCode);
       Serial.println("Reservoir 2 and pH data sent successfully.");
     } else {
       Serial.print("Error sending data: ");
