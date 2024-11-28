@@ -178,6 +178,51 @@ app.post('/start-pump', (req, res) => {
 });
 
 
+// Endpoint to update Reservoir 1 fill percentage
+app.post('/api/reservoir1-fill', (req, res) => {
+    const { reservoir1_fill } = req.body;
+
+    if (reservoir1_fill === undefined) {
+        return res.status(400).send('Reservoir 1 fill percentage is required');
+    }
+
+    const query = `
+        INSERT INTO reservoir_1 (water_level, timestamp)
+        VALUES (?, NOW())
+    `;
+
+    db.query(query, [reservoir1_fill], (err, result) => {
+        if (err) {
+            console.error('Error updating Reservoir 1 fill percentage:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.status(200).send('Reservoir 1 fill percentage updated successfully');
+    });
+});
+
+// Endpoint to update Reservoir 2 fill percentage, pH level, and nutrient concentration
+app.post('/api/reservoir2-fill', (req, res) => {
+    const { reservoir2_fill, ph_level, nutrient_concentration } = req.body;
+
+    if (reservoir2_fill === undefined || ph_level === undefined || nutrient_concentration === undefined) {
+        return res.status(400).send('Reservoir 2 fill percentage, pH level, and nutrient concentration are required');
+    }
+
+    const query = `
+        INSERT INTO reservoir_2 (water_level, ph_level, nutrient_concentration, timestamp)
+        VALUES (?, ?, ?, NOW())
+    `;
+
+    db.query(query, [reservoir2_fill, ph_level, nutrient_concentration], (err, result) => {
+        if (err) {
+            console.error('Error updating Reservoir 2 data:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        res.status(200).send('Reservoir 2 data updated successfully');
+    });
+});
+
+
 
 // Root route to respond at http://localhost:3000/
 app.get('/', (req, res) => {
