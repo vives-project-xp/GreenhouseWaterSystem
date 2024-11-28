@@ -43,19 +43,19 @@ void pollSensorsReservoir()
 
   if(sensor_High_reservoir_value == 1)
   {
-    Serial.println("200l left");
+    Serial.println("210l left");
   }
   else if(sensor_Mid_reservoir_value == 1)
   {
-    Serial.println("150l left");
+    Serial.println("135l left");
   }
   else if(sensor_Low_reservoir_value == 1)
   {
-    Serial.println("50l left");
+    Serial.println("70l left");
   }
   else if(sensor_Empty_reservoir_value == 1)
   {
-    Serial.println("20l left");
+    Serial.println("25l left");
   }
   else
   {
