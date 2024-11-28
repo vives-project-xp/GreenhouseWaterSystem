@@ -2,6 +2,9 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <NTPClient.h>
+#include "connection.h"
+#include "sensor.h"
+#include "config.h"
 
 #define sensor_Empty_reservoir_1 0 //sensor for 35 left
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
@@ -20,6 +23,15 @@ NTPClient timeClient(ntpUDP);
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
 const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
+
+HaConnection connection;
+HaSensor waterValueSensor1;
+HaSensor waterValueSensor2;
+HaSensor ecSensor;
+HaSensor phSensor;
+string reservoirLevel1 = "0%";
+string reservoirLevel2 = "0%";
+
 
 float calibration_value = 21.34 + 0.7;
 unsigned long int avgValue;  // Store the average value of the sensor feedback
@@ -52,6 +64,11 @@ void setup() {
   pinMode(sensor_High_reservoir_0, INPUT);
   pinMode(pH_sensor, INPUT);
   pinMode(relay, OUTPUT);
+
+  connection = HaConnection(ssid, password);
+
+    if (!connection.connected)
+    return;
 
   connectToWiFi();
 
@@ -103,30 +120,47 @@ int pollSensorsReservoir_1() {
   Serial.print("Reservoir 1: ");
   if(sensor_High_reservoir_1_value == 1)
   {
+    reservoirLevel1 = "95%";
     Serial.println("210l left");
     return 95;
   }
   else if(sensor_Mid_reservoir_1_value == 1)
   {
+      reservoirLevel1 = "75%";
     Serial.println("135l left");
     return 75;
   }
   else if(sensor_Low_reservoir_1_value == 1)
   {
+      reservoirLevel1 = "30%";
     Serial.println("70l left");
     return 30;
   }
   else if(sensor_Empty_reservoir_1_value == 1)
   {
+      reservoirLevel1 = "10%";
     Serial.println("25l left");
     return 10;
   }
   else
   {
+      reservoirLevel1 = "0%";
     Serial.println("<25l left");
   }
   return 0; // Empty reservoir
 }
+
+ ReservoirValue1 = HaSensor("Waterlevel", SensorType::WATERLEVEL);
+ waterValueSensor1.setValue(reservoirLevel1);
+
+ ResevoirValue2 = HaSensor("Waterlevel", SensorType::WATERLEVEL);
+ waterValueSensor2.setValue("placeholder");)
+ 
+ ecSensor = HaSensor("EC-value", SensorType::EC);
+ ecSensor.setValue("placceholder");
+
+ phSensor = HaSensor("PH-value", SensorType::PH);
+ phSensor.setValue("placeholder"); 
 
 // Function to poll sensors for Reservoir 0
 int pollSensorsReservoir_0() {
@@ -137,7 +171,9 @@ int pollSensorsReservoir_0() {
   if(sensor_High_reservoir_0_value == 1) {
     return 100; // Reservoir 0 is full
   } else if(sensor_Mid_reservoir_0_value == 1) {
+      reservoirLevel2 = "50%;"
     return 50;
+
   } else if(sensor_Low_reservoir_0_value == 1) {
     return 0;
   }
