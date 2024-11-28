@@ -138,11 +138,15 @@ int pollSensorsReservoir_0() {
   int sensor_High_reservoir_0_value = digitalRead(sensor_High_reservoir_0);
 
   if(sensor_High_reservoir_0_value == 1) {
+      resevoirValue2 = "95%";
     return 70; // Reservoir 0 is full
   } else if(sensor_Mid_reservoir_0_value == 1) {
+      reservoirLevel2 = "50%;"
     return 50;
+
   } else if(sensor_Low_reservoir_0_value == 1) {
-    return 25;
+      reservoirLevel2 = "5%";
+      return 25;
   }
   return 0; // Empty reservoir
 }
