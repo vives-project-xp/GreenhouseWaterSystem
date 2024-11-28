@@ -59,7 +59,7 @@ void pollSensorsReservoir()
   }
   else
   {
-    Serial.println("0l left");
+    Serial.println("<25l left");
   }
 }
 
