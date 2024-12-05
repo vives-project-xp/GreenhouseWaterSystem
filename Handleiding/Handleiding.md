@@ -67,9 +67,9 @@ HTTPClient (voor API-communicatie).
 ## Hoe het Werkt
 
 ### Weersvoorspellingen:
-    De ESP32 haalt voorspellingen op en berekent de verwachte hoeveelheid regenwater voor de volgende dag, de volgende 3 dagen en de komende 7 dagen.
+   De ESP32 haalt voorspellingen op en berekent de verwachte hoeveelheid regenwater voor de volgende dag, de volgende 3 dagen en de komende 7 dagen.
 ### Niveausensoren:
-    De sensoren in het reservoir zijn switches die een '0' geven als er geen water is en een '1' als er wel water is.
+   De sensoren in het reservoir zijn switches die een '0' geven als er geen water is en een '1' als er wel water is.
     Deze sensoren hangen op 4 of 3 verschillende niveaus in het reservoir.
     Activeren de pomp indien er genoeg water in het 1ste reservoir is en er water nodig is in het 2de reservoir.
 ### Kwaliteitscontrole:
