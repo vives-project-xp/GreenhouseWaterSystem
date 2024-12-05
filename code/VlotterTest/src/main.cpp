@@ -48,7 +48,7 @@ void loop() {
   relayControl();
   pollSensorsReservoir_1();
   pollSensorsReservoir_0();
-  pollSensorspH();
+  pollSensorspH();  
   
   // After polling, send data to the server
   sendDataToServer(50, 60, 6.5);

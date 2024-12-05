@@ -156,7 +156,7 @@ app.get('/api/pump-status', (req, res) => {
                 duration: rawData.duration
             };
 
-            console.log('Pump Status Data:', response); // Log the formatted data
+            //console.log('Pump Status Data:', response); // Log the formatted data
             res.json(response);
         } else {
             console.log('No pump data available'); // Log if no data found
@@ -166,14 +166,31 @@ app.get('/api/pump-status', (req, res) => {
 });
 
 
-app.post('/start-pump', (req, res) => {
-    exec('path/to/your/CSharpPumpScript.exe', (err, stdout, stderr) => {
+app.post('/api/pump-duration', (req, res) => {
+    const { start_time, duration } = req.body;
+
+    // Validate inputs
+    if (!start_time || !duration || isNaN(duration) || duration <= 0) {
+        return res.status(400).send('Start time and a positive duration are required.');
+    }
+
+    // Calculate stop time
+    const stopTime = new Date(new Date(start_time).getTime() + duration * 1000); // Convert duration to milliseconds
+
+    // Insert data into the database
+    const query = `
+        INSERT INTO pump_activity (timestamp_on, timestamp_off, duration) 
+        VALUES (?, ?, ?)
+    `;
+
+    db.query(query, [new Date(start_time), stopTime, duration], (err, result) => {
         if (err) {
-            console.error(`Error starting pump: ${stderr}`);
-            return res.status(500).json({ message: 'Failed to start pump.' });
+            console.error('Error inserting pump activity:', err);
+            return res.status(500).send('Failed to log pump activity.');
         }
-        console.log(`Pump started: ${stdout}`);
-        res.status(200).json({ message: 'Pump started successfully.' });
+
+        console.log(`Pump activity logged: Start Time = ${start_time}, Stop Time = ${stopTime}, Duration = ${duration}s`);
+        res.status(200).send('Pump activity logged successfully.');
     });
 });
 
@@ -231,6 +248,6 @@ app.get('/', (req, res) => {
 
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running at http://0.0.0.0:${port}`);
 });

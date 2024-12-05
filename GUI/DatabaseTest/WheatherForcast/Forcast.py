@@ -11,7 +11,7 @@ openmeteo = openmeteo_requests.Client(session = retry_session)
 
 # Make sure all required weather variables are listed here
 # The order of variables in hourly or daily is important to assign them correctly below
-url = "https://api.open-meteo.com/v1/forecast"
+url = "https://api.open-meteo.com/v1/forecast"  
 params = {
 	"latitude": 51.1871631,
 	"longitude": 3.2035464,
@@ -54,4 +54,4 @@ pd.set_option('display.width', None)  # Prevent line wrapping
 hourly_dataframe = pd.DataFrame(data = hourly_data)
 # Save the hourly dataframe to a CSV file
 hourly_dataframe.to_csv('hourly_precipitation_data.csv', index=False)
-print(hourly_dataframe)
+#print(hourly_dataframe)
