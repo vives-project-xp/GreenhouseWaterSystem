@@ -13,7 +13,7 @@
     <div class="tabs">
         <button onclick="showTab('currentData')">Dashboard</button>
         <button onclick="showTab('logs')">Logs</button>
-        <button id="runPythonScript">Rain Prediction</button> <!-- New Tab Button -->
+        <button id="runPythonScript">Rain Prediction</button>
     </div>
 
     <!-- Dashboard Tab -->
@@ -23,50 +23,61 @@
             <div class="card">
                 <h2>Reservoir 1</h2>
                 <p><strong>Water Level:</strong> <span id="water-level-1">Loading...</span></p>
-                <p><strong>Volume:</strong> <span id="water-volume-1">Loading...</span> liters</p> <!-- Volume in Liters -->
-                <button id="rain-cycle-button" class="day-button one-day" onclick="cycleRainPrediction()">1</button>
-
+                <p><strong>Volume:</strong> <span id="water-volume-1">Loading...</span> liters</p>
             </div>
 
             <!-- Reservoir 2 Block -->
             <div class="card">
                 <h2>Reservoir 2</h2>
                 <p><strong>Water Level:</strong> <span id="water-level-2">Loading...</span></p>
-                <p><strong>Volume:</strong> <span id="water-volume-2">Loading...</span> liters</p> <!-- Volume in Liters -->
-                <button id="rain-cycle-button" class="day-button one-day" onclick="cycleRainPrediction()">1</button>
-
+                <p><strong>Volume:</strong> <span id="water-volume-2">Loading...</span> liters</p>
             </div>
+
+            <!-- Nutrient & pH Block -->
             <div class="card">
-                <h2>Nutriënt & pH Status</h2>
+                <h2>Nutrient & pH Status</h2>
                 <p><strong>pH Level:</strong> <span id="ph-level">Loading...</span></p>
                 <p><strong>Nutrient Concentration:</strong> <span id="nutrient-concentration">Loading...</span></p>
             </div>
+
             <!-- Rain Prediction Block -->
             <div class="card">
                 <h2>Rain Prediction</h2>
                 <div id="rain-prediction-data">Loading Rain Prediction Data...</div>
-                <p id="rain-last-updated">Last updated: --</p> <!-- Display last updated time -->
+                <p id="rain-last-updated">Last updated: --</p>
             </div>
+
+            <!-- Pump Status Block -->
             <div class="card">
                 <h2>Pump Status</h2>
                 <p><strong>Last Pump On:</strong> <span id="pump-last-on">Loading...</span></p>
                 <p><strong>Last Pump Duration:</strong> <span id="pump-duration">Loading...</span> seconds</p>
                 <button id="start-pump-button" onclick="startPump()">Start Pump</button>
             </div>
-            
         </div>
     </div>
 
     <!-- Logs Tab -->
     <div id="logs" class="tab">
-        <h2>Reservoir and Pump Logs</h2>
-        <div id="reservoir1-logs">Loading Reservoir 1 Logs...</div>
-        <div id="reservoir2-logs">Loading Reservoir 2 Logs...</div>
-        <div id="pump-logs">Loading Pump Activity Logs...</div>
+        <h3>Reservoir 1 Logs</h3>
+        <div id="reservoir1-logs" class="log-box"></div>
+        <button id="expand-reservoir1-btn" onclick="expandLogs('reservoir1')">Show More</button>
+
+        <h3>Reservoir 2 Logs</h3>
+        <div id="reservoir2-logs" class="log-box"></div>
+        <button id="expand-reservoir2-btn" onclick="expandLogs('reservoir2')">Show More</button>
+
+        <h3>Pump Activity Logs</h3>
+        <div id="pump-logs" class="log-box"></div>
+        <button id="expand-pump-btn" onclick="expandLogs('pump')">Show More</button>
     </div>
+    
+    
 
 
     <script>
+
+
         async function fetchData() {
             const response = await fetch('http://localhost:3000/api/reservoirs');
             const data = await response.json();
@@ -92,19 +103,56 @@
         }
 
 
-        async function fetchLogs() {
-            const response = await fetch('http://localhost:3000/api/logs');
-            const logs = await response.json();
-            
-            // Populate logs
-            const reservoir1Logs = logs.reservoir1;
-            const reservoir2Logs = logs.reservoir2;
-            const pumpLogs = logs.pump;
+        const logLimits = {
+            reservoir1: 5,
+            reservoir2: 5,
+            pump: 5,
+        };
 
-            document.getElementById('reservoir1-logs').innerHTML = `<h3>Reservoir 1 Logs</h3><pre>${JSON.stringify(reservoir1Logs, null, 2)}</pre>`;
-            document.getElementById('reservoir2-logs').innerHTML = `<h3>Reservoir 2 Logs</h3><pre>${JSON.stringify(reservoir2Logs, null, 2)}</pre>`;
-            document.getElementById('pump-logs').innerHTML = `<h3>Pump Activity Logs</h3><pre>${JSON.stringify(pumpLogs, null, 2)}</pre>`;
+        // Fetch logs for all categories
+        async function fetchLogs() {
+            try {
+                const response = await fetch('http://localhost:3000/api/logs');
+                const logs = await response.json();
+
+                // Store logs in dataset attributes for future expansion
+                document.getElementById('reservoir1-logs').dataset.logs = JSON.stringify(logs.reservoir1);
+                document.getElementById('reservoir2-logs').dataset.logs = JSON.stringify(logs.reservoir2);
+                document.getElementById('pump-logs').dataset.logs = JSON.stringify(logs.pump);
+
+                // Render the first 5 logs for each category
+                renderLogs('reservoir1');
+                renderLogs('reservoir2');
+                renderLogs('pump');
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+            }
         }
+
+        // Render logs with dynamic limit
+        function renderLogs(logType) {
+            const container = document.getElementById(`${logType}-logs`);
+            const logs = JSON.parse(container.dataset.logs || '[]');
+            const limit = logLimits[logType];
+
+            // Render only up to the current limit
+            container.innerHTML = logs
+                .slice(0, limit)
+                .map((log, index) => `<p><strong>Log ${index + 1}:</strong> ${JSON.stringify(log)}</p>`)
+                .join('');
+
+            // Add a "No more logs" message if all logs are shown
+            if (logs.length <= limit) {
+                document.getElementById(`expand-${logType}-btn`).disabled = true;
+            }
+        }
+
+        // Expand logs in increments of 5
+        function expandLogs(logType) {
+            logLimits[logType] += 5; // Increase the limit
+            renderLogs(logType); // Re-render logs
+        }
+
 
         async function fetchRainPrediction() {
             const response = await fetch('http://localhost:3000/api/rain');

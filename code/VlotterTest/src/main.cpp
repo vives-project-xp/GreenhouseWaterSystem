@@ -24,13 +24,12 @@ const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
 const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
 
-HaConnection connection;
-HaSensor waterValueSensor1;
-HaSensor waterValueSensor2;
-HaSensor ecSensor;
-HaSensor phSensor;
-string reservoirLevel1 = "0%";
-string reservoirLevel2 = "0%";
+//HaConnection connection;
+//HaSensor waterValueSensor1;
+//HaSensor waterValueSensor2;
+//HaSensor ecSensor;
+//HaSensor phSensor;
+
 
 
 float calibration_value = 21.34 + 0.7;
@@ -65,16 +64,28 @@ void setup() {
   pinMode(pH_sensor, INPUT);
   pinMode(relay, OUTPUT);
 
-  connection = HaConnection(ssid, password);
+  //connection = HaConnection(ssid, password);
 
-    if (!connection.connected)
-    return;
+  //if (!connection.connected)
+  //return;
 
   connectToWiFi();
 
   // Initialize NTP client
   timeClient.begin();
   timeClient.setTimeOffset(3600); // Timezone offset for Brussels (UTC+1)
+  if (WiFi.status() == WL_CONNECTED) {
+  Serial.println("Testing server connection...");
+  WiFiClient client;
+  if (client.connect("10.195.248.12", 3000)) {
+    Serial.println("Server reachable!");
+    client.stop();
+  } else {
+    Serial.println("Server not reachable!");
+  }
+}
+
+
 }
 
 void loop() {
@@ -82,20 +93,28 @@ void loop() {
   delay(1000); // Delay to avoid spamming requests, adjust as needed
   static int lastReservoir1Percentage = 0;
   static int lastReservoir0Percentage = 0;
-  static float lastPhValue = -1.0;
+  static float lastPhValue = 1.0;
 
   int currentReservoir1Percentage = pollSensorsReservoir_1();
-  //int currentReservoir0Percentage = pollSensorsReservoir_0();
+  int currentReservoir0Percentage = pollSensorsReservoir_0();
   float currentPhValue = pollSensorspH();
 
-  if (currentReservoir1Percentage != lastReservoir1Percentage ) {
-    //*currentReservoir0Percentage != lastReservoir0Percentage || 
-    //currentPhValue != lastPhValue
+  if (currentReservoir1Percentage != lastReservoir1Percentage || 
+      currentReservoir0Percentage != lastReservoir0Percentage) {
+      //currentPhValue != lastPhValue
+
     
-    sendDataToServer(0, currentReservoir1Percentage, 10);
+    Serial.print("Reservoir 1: ");
+    Serial.println(currentReservoir1Percentage);
+    Serial.print("Reservoir 0: ");
+    Serial.println(currentReservoir0Percentage);
+    Serial.print("pH: ");
+    Serial.println(currentPhValue);
+
+    sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, 10);
     
     lastReservoir1Percentage = currentReservoir1Percentage;
-    //lastReservoir0Percentage = currentReservoir0Percentage;
+    lastReservoir0Percentage = currentReservoir0Percentage;
    // lastPhValue = currentPhValue;
   }
 }
@@ -117,50 +136,33 @@ int pollSensorsReservoir_1() {
   int sensor_Mid_reservoir_1_value = digitalRead(sensor_Mid_reservoir_1);
   int sensor_High_reservoir_1_value = digitalRead(sensor_High_reservoir_1);
 
-  Serial.print("Reservoir 1: ");
   if(sensor_High_reservoir_1_value == 1)
-  {
-    reservoirLevel1 = "95%";
-    Serial.println("210l left");
-    return 95;
-  }
+    {
+      //Serial.println("210l left");
+      return 95;
+    }
   else if(sensor_Mid_reservoir_1_value == 1)
-  {
-      reservoirLevel1 = "75%";
-    Serial.println("135l left");
-    return 75;
-  }
+    {
+      //Serial.println("135l left");
+      return 75;
+    }
   else if(sensor_Low_reservoir_1_value == 1)
-  {
-      reservoirLevel1 = "30%";
-    Serial.println("70l left");
-    return 30;
-  }
+    {
+      // Serial.println("70l left");
+      return 30;
+    }
   else if(sensor_Empty_reservoir_1_value == 1)
-  {
-      reservoirLevel1 = "10%";
-    Serial.println("25l left");
-    return 10;
-  }
-  else
-  {
-      reservoirLevel1 = "0%";
-    Serial.println("<25l left");
-  }
-  return 0; // Empty reservoir
+    {
+      //Serial.println("25l left");
+      return 10;
+    }
+    else
+    {
+      //Serial.println("<25l left");
+      return 0; // Empty reservoir
+    }
 }
 
- ReservoirValue1 = HaSensor("Waterlevel", SensorType::WATERLEVEL);
- waterValueSensor1.setValue(reservoirLevel1);
-
- ResevoirValue2 = HaSensor("Waterlevel", SensorType::WATERLEVEL);
- waterValueSensor2.setValue("placeholder");)
- 
- ecSensor = HaSensor("EC-value", SensorType::EC);
- ecSensor.setValue("placceholder");
-
- phSensor = HaSensor("PH-value", SensorType::PH);
- phSensor.setValue("placeholder"); 
 
 // Function to poll sensors for Reservoir 0
 int pollSensorsReservoir_0() {
@@ -170,13 +172,15 @@ int pollSensorsReservoir_0() {
 
   if(sensor_High_reservoir_0_value == 1) {
     return 100; // Reservoir 0 is full
-  } else if(sensor_Mid_reservoir_0_value == 1) {
-      reservoirLevel2 = "50%;"
+  } 
+  else if(sensor_Mid_reservoir_0_value == 1) {
     return 50;
 
-  } else if(sensor_Low_reservoir_0_value == 1) {
+  } 
+  else if (sensor_Low_reservoir_0_value == 1) {
     return 0;
   }
+  return 0;
 }
 
 // Function to poll pH sensor
@@ -221,8 +225,8 @@ void relayControl() {
 
   if (pumpOn == false) {
     // Check conditions to turn the pump ON
-    if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW) || 
-        (sensor_Empty_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH)) {
+    if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW && sensor_Low_reservoir_0 == HIGH) || 
+        (sensor_Empty_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW)) {
       digitalWrite(relay, HIGH);
       pumpOn = true;
       pumpStartTime = millis(); // Record the start time
@@ -306,49 +310,67 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phVa
     HTTPClient http;
 
     // Send Reservoir 1 data
-    String url = serverURL + "/api/reservoir1-fill"; // Change this to the appropriate endpoint
+    String url = serverURL + "/api/reservoir1-fill";
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
 
     String payload = "{";
     payload += "\"reservoir1_fill\": " + String(reservoir1Percentage);
     payload += "}";
+    
+    // Print debug info
+    Serial.println("Sending Reservoir 1 data to:");
+    Serial.println(url);
+    Serial.println("Payload:");
+    Serial.println(payload);
 
     int httpResponseCode = http.POST(payload);
 
     if (httpResponseCode > 0) {
-      Serial.println("Reservoir 1 data sent successfully.");
+      String response = http.getString();
+      Serial.println("Reservoir 1 HTTP Response code:");
+      Serial.println(httpResponseCode);
+      Serial.println("Response:");
+      Serial.println(response);
     } else {
-      Serial.print("Error sending data: ");
+      Serial.print("Error sending Reservoir 1 data: ");
       Serial.println(httpResponseCode);
     }
     http.end();
 
     // Send Reservoir 2 and pH data
-    url = serverURL + "/api/reservoir2-fill"; // Change this to the appropriate endpoint
+    url = serverURL + "/api/reservoir2-fill";
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
+
     payload = "{";
-    payload += "\"reservoir2_fill\": " + String(reservoir2Fill);
-    payload += ", \"ph_level\": " + String(phValue);
-    payload += ", \"nutrient_concentration\": " + String(420); // Example nutrient concentration
+    payload += "\"reservoir2_fill\": " + String(reservoir2Fill) + ",";
+    payload += "\"ph_level\": " + String(phValue) + ",";
+    payload += "\"nutrient_concentration\": " + String(420); // Example nutrient concentration
     payload += "}";
 
+    // Print debug info
+    Serial.println("Sending Reservoir 2 and pH data to:");
+    Serial.println(url);
+    Serial.println("Payload:");
     Serial.println(payload);
-    
 
     httpResponseCode = http.POST(payload);
 
     if (httpResponseCode > 0) {
+      String response = http.getString();
+      Serial.println("Reservoir 2 and pH HTTP Response code:");
       Serial.println(httpResponseCode);
-      Serial.println("Reservoir 2 and pH data sent successfully.");
+      Serial.println("Response:");
+      Serial.println(response);
     } else {
-      Serial.print("Error sending data: ");
+      Serial.print("Error sending Reservoir 2 and pH data: ");
       Serial.println(httpResponseCode);
     }
 
     http.end();
   } else {
-    Serial.println("WiFi disconnected, unable to send data");
+    Serial.println("WiFi disconnected, unable to send data.");
   }
 }
+

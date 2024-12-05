@@ -198,4 +198,44 @@
   cursor: pointer;
 }
 
-  
+
+/* Logs Styling */
+#logs h3 {
+  color: var(--primary-color); /* Hergebruik van de primaire kleur */
+  font-size: 1.5em;
+  margin-bottom: var(--padding);
+}
+
+#logs .log-box {
+  background-color: var(--card-bg); /* Achtergrond consistent met kaarten */
+  padding: var(--padding);
+  border-radius: var(--border-radius);
+  color: var(--font-color); /* Tekstkleur voor leesbaarheid */
+  margin: 10px 0;
+  max-height: 400px; /* Beperking hoogte voor scrollbare logs */
+  overflow-y: auto; /* Scrollbaar als logs de limiet overschrijden */
+  border: 1px solid var(--primary-color-light); /* Optionele rand voor visuele scheiding */
+}
+
+#logs button {
+  background-color: var(--primary-color); /* Knoppen met primaire kleur */
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease; 
+
+}
+
+#logs button:disabled {
+  background-color: var(--card-bg); /* Gedempte kleur voor uitgeschakelde knoppen */
+  color: var(--font-color-light); /* Lichtere tekstkleur voor uitgeschakelde knoppen */
+  cursor: not-allowed;
+}
+
+#logs button:hover:not(:disabled) {
+  background-color: var(--primary-color-dark); /* Donkerdere tint bij hover */
+}
