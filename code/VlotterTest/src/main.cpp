@@ -10,11 +10,10 @@
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
 #define sensor_Mid_reservoir_1  2 //sensor for 165 left
 #define sensor_High_reservoir_1 3 //sensor for 210 left
-#define pH_sensor 4 //sensor for pH
 #define relay 5 //relay for pump
 #define sensor_Low_reservoir_0 6 //sensor for 25 left
 #define sensor_Mid_reservoir_0  7 //sensor for 70 left
-#define sensor_High_reservoir_0  8 //sensor for 185 left
+#define sensor_High_reservoir_0  4 //sensor for 185 left
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
@@ -24,12 +23,10 @@ const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
 const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
 
-//HaConnection connection;
-//HaSensor waterValueSensor1;
-//HaSensor waterValueSensor2;
-//HaSensor ecSensor;
-//HaSensor phSensor;
-
+HaConnection connection;
+HaSensor reservoir1Sensor;
+HaSensor reservoir2Sensor;
+//HaSensor phSensor("pH Level", SensorType::PH);
 
 
 float calibration_value = 21.34 + 0.7;
@@ -44,7 +41,6 @@ int seconds = 0;
 // Function declarations:
 int pollSensorsReservoir_1();
 int pollSensorsReservoir_0();
-float pollSensorspH();
 void relayControl();
 void connectToWiFi();
 void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phValue);
@@ -61,29 +57,37 @@ void setup() {
   pinMode(sensor_Low_reservoir_0, INPUT);
   pinMode(sensor_Mid_reservoir_0, INPUT);
   pinMode(sensor_High_reservoir_0, INPUT);
-  pinMode(pH_sensor, INPUT);
   pinMode(relay, OUTPUT);
 
-  //connection = HaConnection(ssid, password);
-
-  //if (!connection.connected)
-  //return;
 
   connectToWiFi();
 
+  connection = HaConnection(ssid, password);
+
+  if (!connection.connected) {
+      Serial.println("Kan geen verbinding maken met Home Assistant");
+      return;
+  }
+
+  Serial.println("Verbonden met Home Assistant!");
+
+
   // Initialize NTP client
   timeClient.begin();
-  timeClient.setTimeOffset(3600); // Timezone offset for Brussels (UTC+1)
+  timeClient.setTimeOffset(2600); // Timezone offset for Brussels (UTC+1)
+
   if (WiFi.status() == WL_CONNECTED) {
-  Serial.println("Testing server connection...");
-  WiFiClient client;
-  if (client.connect("10.195.248.12", 3000)) {
-    Serial.println("Server reachable!");
-    client.stop();
-  } else {
-    Serial.println("Server not reachable!");
+    Serial.println("Testing server connection...");
+    WiFiClient client;
+    if (client.connect("10.195.248.12", 3000)) {
+      Serial.println("Server reachable!");
+      client.stop();
+    } else {
+      Serial.println("Server not reachable!");
+    }
   }
-}
+  reservoir1Sensor = HaSensor("Reservoir 1", SensorType::WATERLEVEL, 0, 100);
+  reservoir2Sensor = HaSensor("Reservoir 2", SensorType::WATERLEVEL, 0, 100);
 
 
 }
@@ -93,29 +97,29 @@ void loop() {
   delay(1000); // Delay to avoid spamming requests, adjust as needed
   static int lastReservoir1Percentage = 0;
   static int lastReservoir0Percentage = 0;
-  static float lastPhValue = 1.0;
 
   int currentReservoir1Percentage = pollSensorsReservoir_1();
   int currentReservoir0Percentage = pollSensorsReservoir_0();
-  float currentPhValue = pollSensorspH();
+
+  reservoir1Sensor.setValue(currentReservoir0Percentage);
+  reservoir2Sensor.setValue(currentReservoir0Percentage);
+
 
   if (currentReservoir1Percentage != lastReservoir1Percentage || 
       currentReservoir0Percentage != lastReservoir0Percentage) {
-      //currentPhValue != lastPhValue
 
     
     Serial.print("Reservoir 1: ");
     Serial.println(currentReservoir1Percentage);
     Serial.print("Reservoir 0: ");
     Serial.println(currentReservoir0Percentage);
-    Serial.print("pH: ");
-    Serial.println(currentPhValue);
 
+    connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor
+    });
     sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, 10);
     
     lastReservoir1Percentage = currentReservoir1Percentage;
     lastReservoir0Percentage = currentReservoir0Percentage;
-   // lastPhValue = currentPhValue;
   }
 }
 
@@ -183,31 +187,6 @@ int pollSensorsReservoir_0() {
   return 0;
 }
 
-// Function to poll pH sensor
-float pollSensorspH() {
-  for(int i = 0; i < 10; i++) {
-    buf[i] = analogRead(pH_sensor);
-    delay(10);
-  }
-
-  for(int i = 0; i < 9; i++) {
-    for(int j = i + 1; j < 10; j++) {
-      if(buf[i] > buf[j]) {
-        temp = buf[i];
-        buf[i] = buf[j];
-        buf[j] = temp;
-      }
-    }
-  }
-
-  avgValue = 0;
-  for(int i = 2; i < 8; i++) avgValue += buf[i];
-  
-  float phValue = (float)avgValue * 5.0 / 1024 / 6;
-  phValue = -5.70 * phValue + calibration_value; // Convert to pH
-
-  return phValue;
-}
 
 // Function to control relay (pump)
 void relayControl() {
