@@ -1,10 +1,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <HTTPClient.h>
+#include <WiFiClient.h>
 #include <NTPClient.h>
 #include "connection.h"
 #include "sensor.h"
 #include "config.h"
+#include <WiFiUdp.h>
+#include <HTTPClient.h>
 
 #define sensor_Empty_reservoir_1 0 //sensor for 35 left
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
@@ -17,7 +19,8 @@
 
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+NTPClient timeClient(ntpUDP); 
+
 
 
 const char* ssid = "devbit";
@@ -115,8 +118,7 @@ void loop() {
     Serial.print("Reservoir 0: ");
     Serial.println(currentReservoir0Percentage);
 
-    connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor
-    });
+    connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
     sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, 10);
     
     lastReservoir1Percentage = currentReservoir1Percentage;
@@ -232,6 +234,7 @@ void relayControl() {
 // Function to send pump duration data to the server
 void sendPumpDurationToServer(String startDateTime, unsigned long duration) {
   if (WiFi.status() == WL_CONNECTED) {
+
     HTTPClient http;
 
     // Prepare the server endpoint
