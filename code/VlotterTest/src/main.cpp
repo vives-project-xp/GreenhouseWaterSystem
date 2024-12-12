@@ -19,6 +19,7 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
+
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
 const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
