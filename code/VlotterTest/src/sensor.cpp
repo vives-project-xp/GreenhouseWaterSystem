@@ -1,6 +1,7 @@
 #include "sensor.h"
 #include <map>
 #include <ArduinoJson.h> 
+#include <Arduino.h>
 
 HaSensor::HaSensor(){};
 HaSensor::HaSensor(String name, SensorType type, int min, int max) : name(name), type(type) {
