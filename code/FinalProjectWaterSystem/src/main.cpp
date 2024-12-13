@@ -1,15 +1,17 @@
 #include <Arduino.h>
-#include <vector>
-
-// #include <WiFiUdp.h>
 #include <WiFi.h>
-// #include <WiFiClient.h>
 #include <NTPClient.h>
 #include <HTTPClient.h>
+#include <Wire.h>
+#include "EEPROM.h"
+#include <DFRobot_ADS1115.h>
+#include <DFRobot_ESP_EC.h>
+
 
 #include "sensor.h"
-#include "config.h"
 #include "connection.h"
+
+
 
 #define sensor_Empty_reservoir_1 0 //sensor for 35 left
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
@@ -27,11 +29,12 @@ NTPClient timeClient(ntpUDP);
 
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
-const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
+const String serverURL = "http://10.10.2.20:8123"; // Replace with your server's IP
 
 HaConnection connection;
 HaSensor reservoir1Sensor;
 HaSensor reservoir2Sensor;
+HaSensor ecSensor;
 //HaSensor phSensor("pH Level", SensorType::PH);
 
 
@@ -53,9 +56,35 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phVa
 void sendPumpDurationToServer(String startDateTime, unsigned long duration);
 String getFormattedDateTime();
 
+
+// Create an instance of the EC sensor
+DFRobot_ESP_EC ec;
+DFRobot_ADS1115 ads(&Wire);
+
+// Define variables for the EC sensor
+float voltage, ecValue, temperature = 25.0;
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  // Needed for storing calibration K in EEPROM
+  EEPROM.begin(32); 
+  // Initialize EC sensor library (default calibration index is 10)
+  ec.begin();       
   
+  // ADS1115 initialization
+
+  // I2C address: 0x48
+  ads.setAddr_ADS1115(ADS1115_IIC_ADDRESS1); 
+  // Set ADC gain to 2/3 (default)
+  ads.setGain(eGAIN_TWOTHIRDS);              
+  // Single-shot mode
+  ads.setMode(eMODE_SINGLE);                
+  // Data rate: 128 SPS (default)
+  ads.setRate(eRATE_128);                   
+  // Start single conversion
+  ads.setOSMode(eOSMODE_SINGLE);            
+  //initialize the ADC
+  ads.init();   
+
   pinMode(sensor_Empty_reservoir_1, INPUT);
   pinMode(sensor_Low_reservoir_1, INPUT);
   pinMode(sensor_Mid_reservoir_1, INPUT);
@@ -94,8 +123,12 @@ void setup() {
   }
   reservoir1Sensor = HaSensor("Reservoir 1", SensorType::WATERLEVEL, 0, 100);
   reservoir2Sensor = HaSensor("Reservoir 2", SensorType::WATERLEVEL, 0, 100);
+  ecSensor = HaSensor("EC Level", SensorType::EC, 0, 100);
 
-
+  //read the ec value from the sensor
+  voltage = ads.readVoltage(0) / 2;
+  ecValue = ec.readEC(voltage, temperature);
+  ecSensor.setValue(ecValue);
 }
 
 void loop() {
@@ -109,7 +142,14 @@ void loop() {
 
   reservoir1Sensor.setValue(currentReservoir0Percentage);
   reservoir2Sensor.setValue(currentReservoir0Percentage);
-
+  static unsigned long timepoint = millis();
+  if (millis() - timepoint > 86400000) 
+    {
+      timepoint = millis();
+      voltage = ads.readVoltage(0) / 2;
+      ecValue = ec.readEC(voltage, temperature);
+      ecSensor.setValue(ecValue);
+    }
 
   if (currentReservoir1Percentage != lastReservoir1Percentage || 
       currentReservoir0Percentage != lastReservoir0Percentage) {
@@ -121,7 +161,8 @@ void loop() {
     Serial.println(currentReservoir0Percentage);
 
     connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
-    sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, 10);
+    connection.sendData("EC Data", {ecSensor});
+    sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, ecValue);
     
     lastReservoir1Percentage = currentReservoir1Percentage;
     lastReservoir0Percentage = currentReservoir0Percentage;
@@ -290,7 +331,7 @@ String getFormattedDateTime() {
 
 
 // Function to send data to the server
-void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phValue) {
+void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float ecValue) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
 
@@ -330,8 +371,8 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float phVa
 
     payload = "{";
     payload += "\"reservoir2_fill\": " + String(reservoir2Fill) + ",";
-    payload += "\"ph_level\": " + String(phValue) + ",";
-    payload += "\"nutrient_concentration\": " + String(420); // Example nutrient concentration
+    payload += "\"ph_level\": " + String(420) + ",";
+    payload += "\"nutrient_concentration\": " + String(ecValue); // Example nutrient concentration
     payload += "}";
 
     // Print debug info

@@ -5,6 +5,7 @@
 #include <ESPmDNS.h>
 #include "sensor.h"
 #include <HTTPClient.h>
+#include <vector>
 
 class HaConnection {
 
@@ -12,7 +13,7 @@ private:
     String ssid;
     String password;
     String device_name;
-    WiFiServer server;
+    WiFiServer* server;
     String HAIp;
     int HAPort;
     int port;

@@ -1,6 +1,7 @@
 #include "connection.h"
 #include <vector>
 #include <ArduinoJson.h>
+#include <HTTPClient.h>
 
 HaConnection::HaConnection() {};
 HaConnection::HaConnection(String ssid, String password): HaConnection(ssid, password, "homeassistant.local", 8123, 80, false) {};
