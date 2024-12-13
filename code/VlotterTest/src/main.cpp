@@ -7,6 +7,8 @@
 #include "config.h"
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
+#include <HttpClient.h>
+#include <vector>
 
 #define sensor_Empty_reservoir_1 0 //sensor for 35 left
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
@@ -118,7 +120,7 @@ void loop() {
     Serial.print("Reservoir 0: ");
     Serial.println(currentReservoir0Percentage);
 
-    connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
+    //connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
     sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, 10);
     
     lastReservoir1Percentage = currentReservoir1Percentage;
@@ -235,7 +237,7 @@ void relayControl() {
 void sendPumpDurationToServer(String startDateTime, unsigned long duration) {
   if (WiFi.status() == WL_CONNECTED) {
 
-    HTTPClient http;
+    HttpClient http;
 
     // Prepare the server endpoint
     String url = serverURL + "/api/pump-duration"; // Adjust the endpoint to your server's API

@@ -5,6 +5,7 @@
 #include <ESPmDNS.h>
 #include "sensor.h"
 #include <HTTPClient.h>
+#include <vector>
 
 class HaConnection {
 
