@@ -101,7 +101,7 @@ String HaConnection::stringIP() {
 
 void HaConnection::checkVersion() {
     if (WiFi.status() == WL_CONNECTED) {
-        HTTPClient http;
+        HttpClient http;
         String url = "https://api.github.com/repos/vives-project-xp/GreenhouseNetwork-Monitoring/releases/latest";
         http.begin(url);
         int httpResponseCode = http.GET();
