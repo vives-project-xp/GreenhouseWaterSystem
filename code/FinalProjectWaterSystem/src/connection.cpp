@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 
 HaConnection::HaConnection() {};
-HaConnection::HaConnection(String ssid, String password): HaConnection(ssid, password, "homeassistant.local", 8123, 80, false) {};
+HaConnection::HaConnection(String ssid, String password): HaConnection(ssid, password, "10.10.2.20", 8123, 80, false) {};
 HaConnection::HaConnection(String ssid, String password, String HAIp, int HAPort): HaConnection(ssid, password, HAIp, HAPort, 80, false) {};
 HaConnection::HaConnection(String ssid, String password, String HAIp, int HAPort, int port, bool output): ssid(ssid), password(password), server(WiFiServer(port)), HAIp(HAIp), HAPort(HAPort), port(port), output(output){this->setup();};
 

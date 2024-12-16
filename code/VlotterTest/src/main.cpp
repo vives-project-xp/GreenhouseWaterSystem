@@ -9,14 +9,9 @@
 
 #include "sensor.h"
 #include "config.h"
-<<<<<<< HEAD
 #include "connection.h"
-=======
 #include <WiFiUdp.h>
-#include <HTTPClient.h>
-#include <HttpClient.h>
 #include <vector>
->>>>>>> 3e9d163db7a73c822460d39a0cb4321f2980c51e
 
 #define sensor_Empty_reservoir_1 0 //sensor for 35 left
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
@@ -30,8 +25,6 @@
 // Define NTP Client to get time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP); 
-
-
 
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
@@ -93,7 +86,7 @@ void setup() {
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("Testing server connection...");
     WiFiClient client;
-    if (client.connect("10.195.248.12", 3000)) {
+    if (client.connect("10.10.2.20", 8123)) {
       Serial.println("Server reachable!");
       client.stop();
     } else {

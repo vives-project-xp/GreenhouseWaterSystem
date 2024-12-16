@@ -17,7 +17,7 @@
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
 #define sensor_Mid_reservoir_1  2 //sensor for 165 left
 #define sensor_High_reservoir_1 3 //sensor for 210 left
-#define relay 5 //relay for pump
+#define relay 19 //relay for pump
 #define sensor_Low_reservoir_0 6 //sensor for 25 left
 #define sensor_Mid_reservoir_0  7 //sensor for 70 left
 #define sensor_High_reservoir_0  4 //sensor for 185 left
@@ -29,7 +29,7 @@ NTPClient timeClient(ntpUDP);
 
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
-const String serverURL = "http://10.10.2.20:8123"; // Replace with your server's IP
+const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
 
 HaConnection connection;
 HaSensor reservoir1Sensor;
@@ -114,7 +114,7 @@ void setup() {
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("Testing server connection...");
     WiFiClient client;
-    if (client.connect("10.195.248.12", 3000)) {
+    if (client.connect("10.10.2.70", 3000)) {
       Serial.println("Server reachable!");
       client.stop();
     } else {
@@ -160,10 +160,11 @@ void loop() {
     Serial.print("Reservoir 0: ");
     Serial.println(currentReservoir0Percentage);
 
+    sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, ecValue);
     connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
     connection.sendData("EC Data", {ecSensor});
-    sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, ecValue);
-    
+
+
     lastReservoir1Percentage = currentReservoir1Percentage;
     lastReservoir0Percentage = currentReservoir0Percentage;
   }
@@ -258,7 +259,8 @@ void relayControl() {
 
       // Construct the ISO 8601 start time with date
       pumpStartDateTime = getFormattedDateTime();
-      Serial.println("Pump ON");
+      Serial.print("Pump ON at ");
+      Serial.println(pumpStartDateTime);
     }
   } else {
     // Check conditions to turn the pump OFF
@@ -371,12 +373,12 @@ void sendDataToServer(int reservoir1Percentage, float reservoir2Fill, float ecVa
 
     payload = "{";
     payload += "\"reservoir2_fill\": " + String(reservoir2Fill) + ",";
-    payload += "\"ph_level\": " + String(420) + ",";
+    payload += "\"ph_level\": " + String(7) + ",";
     payload += "\"nutrient_concentration\": " + String(ecValue); // Example nutrient concentration
     payload += "}";
 
     // Print debug info
-    Serial.println("Sending Reservoir 2 and pH data to:");
+    Serial.println("Sending Reservoir 2 and EC data to:");
     Serial.println(url);
     Serial.println("Payload:");
     Serial.println(payload);

@@ -168,6 +168,7 @@ app.get('/api/pump-status', (req, res) => {
 
 app.post('/api/pump-duration', (req, res) => {
     const { start_time, duration } = req.body;
+    console.log('Pump Duration:', start_time, duration);
 
     // Validate inputs
     if (!start_time || !duration || isNaN(duration) || duration <= 0) {

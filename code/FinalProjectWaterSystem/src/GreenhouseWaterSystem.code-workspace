@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"name": "VlotterTest",
+			"path": "../../VlotterTest"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "GreenhouseWaterSystem"
+	}
+}
