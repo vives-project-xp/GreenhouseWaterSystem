@@ -148,6 +148,7 @@ void loop() {
   reservoir1Sensor.setValue(currentReservoir0Percentage);
   reservoir2Sensor.setValue(currentReservoir0Percentage);
   static unsigned long timepoint = millis();
+  static unsigned long timepointNetwork = millis();
   if (millis() - timepoint > 86400000) 
     {
       timepoint = millis();
@@ -166,9 +167,15 @@ void loop() {
     Serial.println(currentReservoir0Percentage);
 
     sendDataToServer(currentReservoir0Percentage, currentReservoir1Percentage, ecValue);
-    connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
-    connection.sendData("EC Data", {ecSensor});
 
+    // Send data to server every hour if the values have changed
+    if(millis() - timepointNetwork > 3600000)
+    {
+      timepointNetwork = millis();
+      connection.sendData("Reservoir Data", {reservoir1Sensor, reservoir2Sensor});
+      connection.sendData("EC Data", {ecSensor});
+    }
+    
 
     lastReservoir1Percentage = currentReservoir1Percentage;
     lastReservoir0Percentage = currentReservoir0Percentage;
