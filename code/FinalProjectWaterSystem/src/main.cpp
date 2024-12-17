@@ -17,7 +17,7 @@
 #define sensor_Low_reservoir_1  1 //sensor for 80 left
 #define sensor_Mid_reservoir_1  2 //sensor for 165 left
 #define sensor_High_reservoir_1 3 //sensor for 210 left
-#define relay 19 //relay for pump
+#define relay 19//relay for pump
 #define sensor_Low_reservoir_0 6 //sensor for 25 left
 #define sensor_Mid_reservoir_0  7 //sensor for 70 left
 #define sensor_High_reservoir_0  4 //sensor for 185 left
@@ -29,7 +29,7 @@ NTPClient timeClient(ntpUDP);
 
 const char* ssid = "devbit";
 const char* password = "Dr@@dloos!";
-const String serverURL = "http://10.10.2.70:3000"; // Replace with your server's IP
+const String serverURL = "http://172.20.10.6:3000"; // Replace with your server's IP
 
 HaConnection connection;
 HaSensor reservoir1Sensor;
@@ -46,6 +46,11 @@ int buf[10], temp;
 int hours = 0;
 int minutes = 0;
 int seconds = 0;
+
+
+
+
+
 
 // Function declarations:
 int pollSensorsReservoir_1();
@@ -114,7 +119,7 @@ void setup() {
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("Testing server connection...");
     WiFiClient client;
-    if (client.connect("10.10.2.70", 3000)) {
+    if (client.connect("172.20.10.6", 3000)) {
       Serial.println("Server reachable!");
       client.stop();
     } else {
@@ -229,7 +234,7 @@ int pollSensorsReservoir_0() {
 
   } 
   else if (sensor_Low_reservoir_0_value == 1) {
-    return 0;
+    return 10;
   }
   return 0;
 }
@@ -262,7 +267,8 @@ void relayControl() {
       Serial.print("Pump ON at ");
       Serial.println(pumpStartDateTime);
     }
-  } else {
+  }
+   else {
     // Check conditions to turn the pump OFF
     if (sensor_Low_reservoir_0_value == LOW || sensor_High_reservoir_1_value == HIGH) {
       digitalWrite(relay, LOW);
