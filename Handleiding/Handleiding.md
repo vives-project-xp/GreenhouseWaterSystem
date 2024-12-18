@@ -63,6 +63,16 @@ HTTPClient (voor API-communicatie).
     
 5. Programma instaleren
 
+ ###  Opstelling van de Software
+
+1. Installeer de software van de github
+
+2. Zorg dat visual studio code op je pc staat
+
+3. upload de code op een ESP Devkit3 c2
+
+4. activeer een server voor de GUI
+
 
 ## Hoe het Werkt
 
