@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const { exec } = require('child_process');
+const path = require('path');
 
 
 const app = express();
@@ -10,7 +11,12 @@ const port = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Serve the index.html file
+app.use(express.static(path.join(__dirname, '.')));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 // MySQL connection
 const db = mysql.createConnection({
     host: '127.0.0.1',
@@ -243,9 +249,6 @@ app.post('/api/reservoir2-fill', (req, res) => {
 
 
 // Root route to respond at http://localhost:3000/
-app.get('/', (req, res) => {
-    res.send('Welcome to the Water Collection System API');
-});
 
 
 // Start the server

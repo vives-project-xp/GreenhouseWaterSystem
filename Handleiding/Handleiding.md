@@ -54,7 +54,7 @@ HTTPClient (voor API-communicatie).
     Verbind de pomp voor watertransport met het kleine reservoir.
     Sluit de pomp aan op een relaismodule, zodat de ESP32 de pomp kan aansturen.
 
-3. waliteitssensoren
+3. Kwaliteitssensoren
     Installeer de pH- en EC-sensor in het grote reservoir.
     Verbind ze met de analoge pinnen van de ESP32.
 

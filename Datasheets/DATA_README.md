@@ -65,25 +65,6 @@
     [More data...](./Recources/schakelRelais.png) 
 
 
-7. level shifter 
-
-    | Connections|Description       |Connected to|
-    | :---:      |    :----:        |   :---:    |
-    | HV1        | high level 1     | pin...     |
-    | HV2        | high level 2     | /          |
-    | HV         | high level select| 5V line    |
-    | GND        | ground           | esp ground |
-    | HV3        | high level 3     | /          |
-    | HV4        | high level 4     | /          |  
-    | LV1        | Low  level 1     | pin...     |
-    | LV2        | Low  level 2     | /          |
-    | LV         | Low  level select| 3.3V esp   |
-    | GND        | ground           | esp ground |
-    | LV3        | Low  level 3     | /          |
-    | LV3        | Low  level 4     | /          | 
-    [More data...](./Recources/levelShifter.png)
-
-
 8. transformator 12V
 
     | Connections|Description|Connected to  |
