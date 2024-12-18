@@ -66,7 +66,7 @@ Below is a list of hardware components used in the project. For detailed connect
    - Zorg voor een overflowleiding om overtollig water af te voeren.  
 
 2. **Software Installatie**:  
-   - Gebruik **Visual Studio Code** om de ESP32 te programmeren.  
+   - Gebruik **Visual Studio Code** om de ESP32 devkit3 c2 te programmeren.  
    - Maak gebruik van benodigde bibliotheken zoals `WiFi` en `HTTPClient` voor draadloze communicatie en API-verbinding.  
 
 3. **Systeemfunctionaliteit**:  
