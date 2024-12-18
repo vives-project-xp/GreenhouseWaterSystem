@@ -38,7 +38,7 @@ This project will serve as a model for future greenhouse installations, providin
 
 ## Components and Connections  
 
-Below is a list of hardware components used in the project. For detailed connection pins and descriptions, refer to the [**Components Datasheet**](./Datasheets\DATA_README.md).
+Below is a list of hardware components used in the project. For detailed connection pins and descriptions, refer to the [**Components Datasheet**](./Datasheets/DATA_README.md).
 
 - Microcontroller (e.g., ESP32)  
 - Water Level Sensor  
@@ -75,4 +75,4 @@ Below is a list of hardware components used in the project. For detailed connect
    - Waterkwaliteit wordt continu gemeten (pH en EC) en meldingen worden gestuurd bij afwijkingen.  
 
 Voor een diepgaande uitleg en gedetailleerde stappen, raadpleeg de volledige handleiding:  
-👉 [**Handleiding: Watermanagementsysteem**](./Handleiding\Handleiding.md)  
+👉 [**Handleiding: Watermanagementsysteem**](./Handleiding/Handleiding.md)  
