@@ -69,9 +69,11 @@ HTTPClient (voor API-communicatie).
 
 2. Zorg dat visual studio code op je pc staat
 
-3. upload de code op een ESP Devkit3 c2
+3. Maak gebruik van benodigde bibliotheken zoals WiFi en HTTPClient voor draadloze communicatie en API-verbinding
 
-4. activeer een server voor de GUI
+4. upload de code op een ESP Devkit3 c2
+
+5. activeer een server voor de GUI
 
 
 ## Hoe het Werkt
