@@ -138,7 +138,7 @@ void setup() {
 
 void loop() {
   relayControl();
-  delay(1000); // Delay to avoid spamming requests, adjust as needed
+  //delay(1000); // Delay to avoid spamming requests, adjust as needed
   static int lastReservoir1Percentage = 0;
   static int lastReservoir0Percentage = 0;
 
@@ -263,7 +263,7 @@ void relayControl() {
 
   if (pumpOn == false) {
     // Check conditions to turn the pump ON
-    if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW && sensor_Low_reservoir_0 == HIGH) || 
+    if ((sensor_High_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH) || 
         (sensor_Empty_reservoir_1_value == LOW && sensor_Low_reservoir_0_value == HIGH && sensor_High_reservoir_1_value == LOW)) {
       digitalWrite(relay, HIGH);
       pumpOn = true;
